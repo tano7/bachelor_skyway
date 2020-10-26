@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>tano_skyway</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="heading">Tano Bachelor SkyWay</h1>
+      <p class="note">
+        Enter remote peer ID to call.<br>
+      </p>
+      入力音声：<div id="result-div"></div>
+      <div class="p2p-data"> <!-- new -->
+        <div class="p2p-media">
+          <div class="remote-stream">
+            <video id="js-remote-stream"></video>
+          </div>
+          <div class="local-stream">
+            <video id="js-local-stream"></video>
+          </div> <!-- 移動-->
+          <p>Your ID: <span id="js-local-id"></span></p>
+          <input type="text" placeholder="Remote Peer ID" id="js-remote-id">
+          <button id="js-call-trigger">Call</button>
+          <button id="js-connect-trigger">Connect</button> <!-- new -->
+          <button id="js-close-trigger">Close</button>
+        </div>
+        <span id="rcv"></span>
+        <div> 
+          <span id="remote"></span>
+          <pre class="messages" id="js-messages"></pre> 
+          <!--<input type="text" id="js-local-text">  
+          <button id="js-send-trigger">Send</button>  -->
+        </div>
+      </div>
+      <p class="meta" id="js-meta"></p>
+    </div>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+    <script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+    <script src="https://cdn.webrtc.ecl.ntt.com/skyway-latest.js"></script>
+    <script src="{{url_for('static', filename='key.js')}}"></script>
+    <script src="{{url_for('static', filename='script.js')}}"></script>
+    <script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+  </body>
+</html>
