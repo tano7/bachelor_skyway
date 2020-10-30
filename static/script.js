@@ -37,6 +37,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
   //const sendTrigger = document.getElementById('js-send-trigger'); //new
 
   const resultDiv = document.querySelector('#result-div');
+  const createPeer = document.getElementById('create-peer');
 
   //とりあえず共通で書いておくやつ
   meta.innerText = `
@@ -59,10 +60,10 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
   await localVideo.play().catch(console.error); //失敗したらコンソールエラー
 
   //PeerIDの取得（APIキーから自分のPeerIDを取得する）
-  const peer = (window.peer = new Peer({
-    key: window.__SKYWAY_KEY__,
-    debug: 3,
-  }));
+  // const peer = (window.peer = new Peer({
+  //   key: window.__SKYWAY_KEY__,
+  //   debug: 3,
+  // }));
 
 
   // これが電話をかけるトリガー--------------------------------------------------
@@ -204,119 +205,128 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
   //こっから呼び出される方？---------------------------------------------------------
 
   //正常に接続した時の処理
-  peer.once('open', id => (localId.textContent = id));
+  createPeer.addEventListener('click', () => {
+    const samp = document.getElementById('sample');
+    const peer = (window.peer = new Peer(samp.value, {
+      key: window.__SKYWAY_KEY__,
+      debug: 3,
+    }));
 
-  //呼び出される側の電話の処理------------------------------------------------------
-  //接続先Peerへのメディアチャンネル接続を管理するクラス
-  peer.on('call', mediaConnection => {
-    mediaConnection.answer(localStream); //localStreamで応答する
-    mediaConnection.on('stream', async stream => {
-      messages.textContent += `=== Call has been connected ===\n`;
-      //リモートの相手を呼び出し先として表示
-      remoteVideo.srcObject = stream;
-      remoteVideo.playsInline = true;
-      await remoteVideo.play().catch(console.error);
+    peer.once('open', id => (localId.textContent = id));
+
+    //呼び出される側の電話の処理------------------------------------------------------
+    //接続先Peerへのメディアチャンネル接続を管理するクラス
+    peer.on('call', mediaConnection => {
+      mediaConnection.answer(localStream); //localStreamで応答する
+      mediaConnection.on('stream', async stream => {
+        messages.textContent += `=== Call has been connected ===\n`;
+        //リモートの相手を呼び出し先として表示
+        remoteVideo.srcObject = stream;
+        remoteVideo.playsInline = true;
+        await remoteVideo.play().catch(console.error);
+      });
+
+      //終了する時の処理
+      mediaConnection.once('close', () => {
+        remoteVideo.srcObject.getTracks().forEach(track => track.stop());
+        remoteVideo.srcObject = null;
+        messages.textContent += `=== Call has been disconnected ===\n`;
+      });
+
+      //電話を終わるトリガー
+      closeTrigger.addEventListener('click', () => mediaConnection.close(true));
     });
 
-    //終了する時の処理
-    mediaConnection.once('close', () => {
-      remoteVideo.srcObject.getTracks().forEach(track => track.stop());
-      remoteVideo.srcObject = null;
-      messages.textContent += `=== Call has been disconnected ===\n`;
-    });
+    //チャット受信側---------------------------------------------------------------
+    //チャットを接続する
+    peer.on('connection', dataConnection => {
+      dataConnection.once('open', async () => {
+        messages.textContent += `=== DataConnection has been opened ===\n`;
+        message=3;
+        ws.send(message);
+        //sendTrigger.addEventListener('click', onClickSend); ここコメントアウトして良かったか試してみないと
+      });
 
-    //電話を終わるトリガー
-    closeTrigger.addEventListener('click', () => mediaConnection.close(true));
-  });
+      dataConnection.on('data', data => {
+        if(data[0] == 'v') {
+          messages.textContent += 'voice recieve\n';
+        }else {
+          messages.textContent += `face_dir_LR: ${data[0]} face_dir_UD: ${data[1]} gazeLR: ${data[2]} gazeUD: ${data[3]}\n`;
+          message=data;
+          ws.send(message); //pythonに送るためにmessageでやっているだけ
+        }
+      });
 
-  //チャット受信側---------------------------------------------------------------
-  //チャットを接続する
-  peer.on('connection', dataConnection => {
-    dataConnection.once('open', async () => {
-      messages.textContent += `=== DataConnection has been opened ===\n`;
-      message=3;
-      ws.send(message);
-      //sendTrigger.addEventListener('click', onClickSend); ここコメントアウトして良かったか試してみないと
-    });
+      //setInterval(ToPython, 350);
 
-    dataConnection.on('data', data => {
-      if(data[0] == 'v') {
-        messages.textContent += 'voice recieve\n';
-      }else {
-        messages.textContent += `face_dir_LR: ${data[0]} face_dir_UD: ${data[1]} gazeLR: ${data[2]} gazeUD: ${data[3]}\n`;
-        message=data;
-        ws.send(message); //pythonに送るためにmessageでやっているだけ
+      //接続を終了する時の処理
+      dataConnection.once('close', () => {
+        messages.textContent += `=== DataConnection has been closed ===\n`;
+        //sendTrigger.removeEventListener('click', onClickSend);
+      });
+
+      ////チャット終わるトリガー
+      closeTrigger.addEventListener('click', () => dataConnection.close(), {
+        once: true,
+      });
+
+      //何か送る時の処理
+      function onClickSend() {
+        //const data = localText.value;
+        dataConnection.send(gaze_BOTH_connect);
+      };
+
+      //Pythonに送る処理
+      //これを行うと視線処理をする
+      function ToPython() {
+        message=1;
+        ws.send(message);
       }
-    });
 
-    //setInterval(ToPython, 350);
+      ws.onmessage = async function(x){
+        var face_value = JSON.parse(x.data); //x.dataで送信された値の中身とってくる
+        var face_dir_LR = face_value[0];
+        var face_dir_UD = face_value[1];
+        var gaze_LR = face_value[2];
+        var gaze_UD = face_value[3];
+        //gaze_BOTH_connect = gaze_value;
+        //gaze_LR_connect = gaze_value[0];
+        //gaze_UD_connect = gaze_UD;
+      
+        //視線情報をhtmlで表示するために#rcv要素にstring型で値を追加していく
+        var string_txt = "face_dir_LR: " + face_dir_LR + " face_dir_UD: " + face_dir_UD + " gaze_LR: " + gaze_LR + " gaze_UD: " + gaze_UD + "<br>"
+        $("#rcv").append(string_txt)  
+        //ここでarray.pushしていく
+        await dataConnection.send(face_value);
 
-    //接続を終了する時の処理
-    dataConnection.once('close', () => {
-      messages.textContent += `=== DataConnection has been closed ===\n`;
-      //sendTrigger.removeEventListener('click', onClickSend);
-    });
-
-    ////チャット終わるトリガー
-    closeTrigger.addEventListener('click', () => dataConnection.close(), {
-      once: true,
-    });
-
-    //何か送る時の処理
-    function onClickSend() {
-      //const data = localText.value;
-      dataConnection.send(gaze_BOTH_connect);
-    };
-
-    //Pythonに送る処理
-    //これを行うと視線処理をする
-    function ToPython() {
-      message=1;
-      ws.send(message);
-    }
-
-    ws.onmessage = async function(x){
-      var face_value = JSON.parse(x.data); //x.dataで送信された値の中身とってくる
-      var face_dir_LR = face_value[0];
-      var face_dir_UD = face_value[1];
-      var gaze_LR = face_value[2];
-      var gaze_UD = face_value[3];
-      //gaze_BOTH_connect = gaze_value;
-      //gaze_LR_connect = gaze_value[0];
-      //gaze_UD_connect = gaze_UD;
-    
-      //視線情報をhtmlで表示するために#rcv要素にstring型で値を追加していく
-      var string_txt = "face_dir_LR: " + face_dir_LR + " face_dir_UD: " + face_dir_UD + " gaze_LR: " + gaze_LR + " gaze_UD: " + gaze_UD + "<br>"
-      $("#rcv").append(string_txt)  
-      //ここでarray.pushしていく
-      await dataConnection.send(face_value);
-
-      if(gaze_LR > 0) { //ここの条件を変更することで注視時の音声入力をする条件を変更できる
-        recognition.start();
-      }else {
-        recognition.stop();
-      }
-    }
-
-    //音声認識を受け取る
-    /*
-    recognition.onresult = (event) => {
-      let interimTranscript = ''; // 暫定(灰色)の認識結果
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        let transcript = event.results[i][0].transcript;
-        if (event.results[i].isFinal) { //isFinalで終了したかどうかを判定
-          finalTranscript += transcript;
-          dataConnection.send("v");
-        } else {
-          interimTranscript = transcript;
+        if(gaze_LR > 0) { //ここの条件を変更することで注視時の音声入力をする条件を変更できる
+          recognition.start();
+        }else {
+          recognition.stop();
         }
       }
-      resultDiv.innerHTML = finalTranscript + '<i style="color:#ddd;">' + interimTranscript + '</i>';
-    }
-    */
 
+      //音声認識を受け取る
+      /*
+      recognition.onresult = (event) => {
+        let interimTranscript = ''; // 暫定(灰色)の認識結果
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          let transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) { //isFinalで終了したかどうかを判定
+            finalTranscript += transcript;
+            dataConnection.send("v");
+          } else {
+            interimTranscript = transcript;
+          }
+        }
+        resultDiv.innerHTML = finalTranscript + '<i style="color:#ddd;">' + interimTranscript + '</i>';
+      }
+      */
+
+    });
+    //new-------------------------------------------------------------------
+
+    peer.on('error', console.error);
   });
-  //new-------------------------------------------------------------------
 
-  peer.on('error', console.error);
 })();
