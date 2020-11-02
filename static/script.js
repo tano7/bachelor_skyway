@@ -176,6 +176,8 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 
       local_face_LR.push(face_dir_LR);
       local_face_UD.push(face_dir_UD);
+
+      console.log(local_face_LR);
     
       //視線情報をhtmlで表示するために#rcv要素にstring型で値を追加していく
       var string_txt = "face_dir_LR: " + face_dir_LR + " face_dir_UD: " + face_dir_UD + " gaze_LR: " + gaze_LR + " gaze_UD: " + gaze_UD + "<br>"
@@ -304,10 +306,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         local_face_UD.push(face_dir_UD);
       
         //視線情報をhtmlで表示するために#rcv要素にstring型で値を追加していく
-        var string_txt = local_face_LR[local_face_LR.length] + "<br>"
-
-
-        //var string_txt = "face_dir_LR: " + face_dir_LR + " face_dir_UD: " + face_dir_UD + " gaze_LR: " + gaze_LR + " gaze_UD: " + gaze_UD + "<br>"
+        var string_txt = "face_dir_LR: " + face_dir_LR + " face_dir_UD: " + face_dir_UD + " gaze_LR: " + gaze_LR + " gaze_UD: " + gaze_UD + "<br>"
         $("#rcv").append(string_txt)  
         //ここでarray.pushしていく
         await dataConnection.send(face_value);
