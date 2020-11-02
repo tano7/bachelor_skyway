@@ -36,8 +36,8 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
   //const localText = document.getElementById('js-local-text'); //new
   //const sendTrigger = document.getElementById('js-send-trigger'); //new
 
-  const resultDiv = document.querySelector('#result-div');
-  const createPeer = document.getElementById('create-peer');
+  const resultDiv = document.querySelector('#result-div'); //音声認識
+  const createPeer = document.getElementById('create-peer'); //PeerID生成
 
   //とりあえず共通で書いておくやつ
   meta.innerText = `
@@ -205,9 +205,9 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
   //こっから呼び出される方？---------------------------------------------------------
 
   //正常に接続した時の処理
-  createPeer.addEventListener('click', () => {
-    const samp = document.getElementById('sample');
-    const peer = (window.peer = new Peer(samp.value, {
+  createPeer.addEventListener('click', () => { 
+    const peer_id = document.getElementById('peer-id');
+    const peer = (window.peer = new Peer(peer_id.value, {
       key: window.__SKYWAY_KEY__,
       debug: 3,
     }));
