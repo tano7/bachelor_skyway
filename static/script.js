@@ -21,6 +21,12 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
   //WebSocket部分
   var host = "ws://localhost:8080/pipe";
   var ws = new WebSocket(host); //接続するサーバを指定
+
+  //相互注視検出用配列
+  var local_face_LR = [0];
+  var local_face_UD = [0];
+  var remote_face_LR = [0];
+  var remote_face_UD = [0];
   
   //htmlにある要素をjsで使用するために紐付ける
   const localVideo = document.getElementById('js-local-stream');
@@ -130,6 +136,8 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     }else {
       messages.textContent += `face_dir_LR: ${data[0]} face_dir_UD: ${data[1]} gazeLR: ${data[2]} gazeUD: ${data[3]}\n`; //$dataに送られてきたデータが入っている．messageに蓄積された内容が入っている
       message=data;
+      remote_face_LR.push(message[0]);
+      remote_face_UD.push(message[1]);
       ws.send(message); //pythonに送るためにmessageでやっているだけ
     }
   });
@@ -165,9 +173,9 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       var face_dir_UD = face_value[1];
       var gaze_LR = face_value[2];
       var gaze_UD = face_value[3];
-      //gaze_BOTH_connect = gaze_value;
-      //gaze_LR_connect = gaze_value[0];
-      //gaze_UD_connect = gaze_UD;
+
+      local_face_LR.push(face_dir_LR);
+      local_face_UD.push(face_dir_UD);
     
       //視線情報をhtmlで表示するために#rcv要素にstring型で値を追加していく
       var string_txt = "face_dir_LR: " + face_dir_LR + " face_dir_UD: " + face_dir_UD + " gaze_LR: " + gaze_LR + " gaze_UD: " + gaze_UD + "<br>"
@@ -175,11 +183,11 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       //ここでdataconnectionすることで撮った瞬間のデータを送る
       await dataConnection.send(face_value);
       
-      if(gaze_LR > 0) { //ここの条件を変更することで注視時の音声入力をする条件を変更できる
-        recognition.start();
-      }else {
-        recognition.stop();
-      }
+      // if(gaze_LR > 0) { //ここの条件を変更することで注視時の音声入力をする条件を変更できる
+      //   recognition.start();
+      // }else {
+      //   recognition.stop();
+      // }
 
     }
 
@@ -253,6 +261,8 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         }else {
           messages.textContent += `face_dir_LR: ${data[0]} face_dir_UD: ${data[1]} gazeLR: ${data[2]} gazeUD: ${data[3]}\n`;
           message=data;
+          remote_face_LR.push(message[0]);
+          remote_face_UD.push(message[1]);
           ws.send(message); //pythonに送るためにmessageでやっているだけ
         }
       });
@@ -289,12 +299,15 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         var face_dir_UD = face_value[1];
         var gaze_LR = face_value[2];
         var gaze_UD = face_value[3];
-        //gaze_BOTH_connect = gaze_value;
-        //gaze_LR_connect = gaze_value[0];
-        //gaze_UD_connect = gaze_UD;
+        
+        local_face_LR.push(face_dir_LR);
+        local_face_UD.push(face_dir_UD);
       
         //視線情報をhtmlで表示するために#rcv要素にstring型で値を追加していく
-        var string_txt = "face_dir_LR: " + face_dir_LR + " face_dir_UD: " + face_dir_UD + " gaze_LR: " + gaze_LR + " gaze_UD: " + gaze_UD + "<br>"
+        var string_txt = local_face_LR[local_face_LR.length] + "<br>"
+
+
+        //var string_txt = "face_dir_LR: " + face_dir_LR + " face_dir_UD: " + face_dir_UD + " gaze_LR: " + gaze_LR + " gaze_UD: " + gaze_UD + "<br>"
         $("#rcv").append(string_txt)  
         //ここでarray.pushしていく
         await dataConnection.send(face_value);
