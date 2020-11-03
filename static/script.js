@@ -117,13 +117,10 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     dataConnection.once('open', async () => {
       messages.textContent += `=== DataConnection has been opened ===\n`;
       //ws.sendで取得した値を動的に取得するためにwebsocketに送信するデータを格納する命令を出す
-      message=3;
+      message='dummy';
       ws.send(message);
-      //sendボタン破棄した
-      //sendTrigger.addEventListener('click', onClickSend); //繋がったらsendボタンを有効にしているみたい
     });
 
-    //setInterval(ToPython, 350);
 
     //送られたデータを表示する処理
     dataConnection.on('data', data => { //on.'data'でデータが送られた時に自動的に発火する
@@ -131,9 +128,9 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       messages.textContent += 'voice recieve\n';
     }else {
       messages.textContent += `face_dir_LR: ${data[0]} face_dir_UD: ${data[1]} gazeLR: ${data[2]} gazeUD: ${data[3]}\n`; //$dataに送られてきたデータが入っている．messageに蓄積された内容が入っている
-      message=data;
-      remote_face_LR.push(message[0]);
-      remote_face_UD.push(message[1]);
+      //message=data;
+      remote_face_LR.push(data[0]);
+      remote_face_UD.push(data[1]);
 
       //相互注視判定
       var i = 1;
@@ -146,10 +143,10 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       }
       if(i == 9) {
         console.log('Mutual Gaze is a sign of love!');
-        message.push('g');
+        data.push('g');
       }
 
-      ws.send(message); //pythonに送るためにmessageでやっているだけ
+      ws.send(data); //pythonに送るためにmessageでやっているだけ
     }
   });
 
@@ -170,12 +167,6 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       //dataConnection.send(data);
       //dataConnection.send(gaze_LR_conncet); //視線情報を取得，相手に送る
       dataConnection.send(gaze_BOTH_connect);
-    }
-
-    //Pythonに送る処理
-    async function ToPython() {
-      message=3;
-      ws.send(message); //pythonに送るためにmessageでやっているだけ
     }
 
     ws.onmessage = async function(x){
@@ -261,9 +252,9 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     peer.on('connection', dataConnection => {
       dataConnection.once('open', async () => {
         messages.textContent += `=== DataConnection has been opened ===\n`;
-        message=3;
+        //ws.sendで取得した値を動的に取得するためにwebsocketに送信するデータを格納する命令を出す
+        message='dummy';
         ws.send(message);
-        //sendTrigger.addEventListener('click', onClickSend); ここコメントアウトして良かったか試してみないと
       });
 
       dataConnection.on('data', data => {
@@ -271,9 +262,9 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
           messages.textContent += 'voice recieve\n';
         }else {
           messages.textContent += `face_dir_LR: ${data[0]} face_dir_UD: ${data[1]} gazeLR: ${data[2]} gazeUD: ${data[3]}\n`;
-          message=data;
-          remote_face_LR.push(message[0]);
-          remote_face_UD.push(message[1]);
+          //message=data;
+          remote_face_LR.push(data[0]);
+          remote_face_UD.push(data[1]);
 
           //相互注視判定
           var i = 1;
@@ -286,10 +277,10 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
           }
           if(i == 9) {
             console.log('Mutual Gaze is a sign of love!');
-            message.push('g');
+            data.push('g');
           }
 
-          ws.send(message); //pythonに送るためにmessageでやっているだけ
+          ws.send(data); //pythonに送るためにmessageでやっているだけ
         }
       });
 
