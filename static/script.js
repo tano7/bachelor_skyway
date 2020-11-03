@@ -1,9 +1,5 @@
 const Peer = window.Peer;
 
-//var gaze_BOTH_connect;
-//var gaze_LR_connect; //水平方向の視線情報が入っている
-//var gaze_UD_connect; //垂直方向の視線情報が入っている
-
 //音声認識----------------------------------------------------
 SpeechRecognition = webkitSpeechRecognition || SpeechRecognition;
 let recognition = new SpeechRecognition();
@@ -120,11 +116,6 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     //初めて繋がった時にメッセージ送る
     dataConnection.once('open', async () => {
       messages.textContent += `=== DataConnection has been opened ===\n`;
-      //ws.sendで取得した値を動的に取得するためにwebsocketに送信するデータを格納する命令を出す
-      message=3;
-      ws.send(message);
-      //sendボタン破棄した
-      //sendTrigger.addEventListener('click', onClickSend); //繋がったらsendボタンを有効にしているみたい
     });
 
     //setInterval(ToPython, 350);
@@ -265,9 +256,6 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     peer.on('connection', dataConnection => {
       dataConnection.once('open', async () => {
         messages.textContent += `=== DataConnection has been opened ===\n`;
-        message=3;
-        ws.send(message);
-        //sendTrigger.addEventListener('click', onClickSend); ここコメントアウトして良かったか試してみないと
       });
 
       dataConnection.on('data', data => {
