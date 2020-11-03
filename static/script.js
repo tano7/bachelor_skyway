@@ -128,7 +128,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       messages.textContent += 'voice recieve\n';
     }else {
       messages.textContent += `face_dir_LR: ${data[0]} face_dir_UD: ${data[1]} gazeLR: ${data[2]} gazeUD: ${data[3]}\n`; //$dataに送られてきたデータが入っている．messageに蓄積された内容が入っている
-      //message=data;
+
       remote_face_LR.push(data[0]);
       remote_face_UD.push(data[1]);
 
@@ -146,14 +146,13 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         data.push('g');
       }
 
-      ws.send(data); //pythonに送るためにmessageでやっているだけ
+      ws.send(data); //Pythonにリモートデータ送信
     }
   });
 
     //接続を終了する時の処理
     dataConnection.once('close', () => {
       messages.textContent += `=== DataConnection has been closed ===\n`;
-      //sendTrigger.removeEventListener('click', onClickSend); //sendボタンダメにする
     });
 
     //チャット終わるトリガー
@@ -161,26 +160,18 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       once: true,
     });
 
-    //データを送信する時の処理
-    async function onClickSend() {
-      //const data = localText.value;
-      //dataConnection.send(data);
-      //dataConnection.send(gaze_LR_conncet); //視線情報を取得，相手に送る
-      dataConnection.send(gaze_BOTH_connect);
-    }
-
     ws.onmessage = async function(x){
       var face_value = JSON.parse(x.data); //x.dataで送信された値の中身とってくる
-      var face_dir_LR = face_value[0];
-      var face_dir_UD = face_value[1];
-      var gaze_LR = face_value[2];
-      var gaze_UD = face_value[3];
+      // var face_dir_LR = face_value[0];
+      // var face_dir_UD = face_value[1];
+      // var gaze_LR = face_value[2];
+      // var gaze_UD = face_value[3];
 
-      local_face_LR.push(face_dir_LR);
-      local_face_UD.push(face_dir_UD);
+      local_face_LR.push(face_value[0]);
+      local_face_UD.push(face_value[1]);
     
       //視線情報をhtmlで表示するために#rcv要素にstring型で値を追加していく
-      var string_txt = "face_dir_LR: " + face_dir_LR + " face_dir_UD: " + face_dir_UD + " gaze_LR: " + gaze_LR + " gaze_UD: " + gaze_UD + "<br>"
+      var string_txt = "face_dir_LR: " + face_value[0] + " face_dir_UD: " + face_value[1] + " gaze_LR: " + face_value[2] + " gaze_UD: " + face_value[3] + "<br>"
       $("#rcv").append(string_txt)      
       //ここでdataconnectionすることで撮った瞬間のデータを送る
       await dataConnection.send(face_value);
@@ -210,9 +201,8 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     }
     */
   });
-  //new--------------------------------------------------------------------------
 
-  //こっから呼び出される方？---------------------------------------------------------
+  //こっから呼び出される方---------------------------------------------------------
 
   //正常に接続した時の処理
   createPeer.addEventListener('click', () => { 
@@ -262,7 +252,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
           messages.textContent += 'voice recieve\n';
         }else {
           messages.textContent += `face_dir_LR: ${data[0]} face_dir_UD: ${data[1]} gazeLR: ${data[2]} gazeUD: ${data[3]}\n`;
-          //message=data;
+
           remote_face_LR.push(data[0]);
           remote_face_UD.push(data[1]);
 
@@ -280,16 +270,13 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
             data.push('g');
           }
 
-          ws.send(data); //pythonに送るためにmessageでやっているだけ
+          ws.send(data); //pythonにリモートデータ送信
         }
       });
-
-      //setInterval(ToPython, 350);
 
       //接続を終了する時の処理
       dataConnection.once('close', () => {
         messages.textContent += `=== DataConnection has been closed ===\n`;
-        //sendTrigger.removeEventListener('click', onClickSend);
       });
 
       ////チャット終わるトリガー
@@ -297,33 +284,19 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         once: true,
       });
 
-      //何か送る時の処理
-      function onClickSend() {
-        //const data = localText.value;
-        dataConnection.send(gaze_BOTH_connect);
-      };
-
-      //Pythonに送る処理
-      //これを行うと視線処理をする
-      function ToPython() {
-        message=1;
-        ws.send(message);
-      }
-
       ws.onmessage = async function(x){
         var face_value = JSON.parse(x.data); //x.dataで送信された値の中身とってくる
-        var face_dir_LR = face_value[0];
-        var face_dir_UD = face_value[1];
-        var gaze_LR = face_value[2];
-        var gaze_UD = face_value[3];
+        // var face_dir_LR = face_value[0];
+        // var face_dir_UD = face_value[1];
+        // var gaze_LR = face_value[2];
+        // var gaze_UD = face_value[3];
         
-        local_face_LR.push(face_dir_LR);
-        local_face_UD.push(face_dir_UD);
+        local_face_LR.push(face_value[0]);
+        local_face_UD.push(face_value[1]);
       
         //視線情報をhtmlで表示するために#rcv要素にstring型で値を追加していく
-        var string_txt = "face_dir_LR: " + face_dir_LR + " face_dir_UD: " + face_dir_UD + " gaze_LR: " + gaze_LR + " gaze_UD: " + gaze_UD + "<br>"
+        var string_txt = "face_dir_LR: " + face_value[0] + " face_dir_UD: " + face_value[1] + " gaze_LR: " + face_value[2] + " gaze_UD: " + face_value[3] + "<br>"
         $("#rcv").append(string_txt)  
-        //ここでarray.pushしていく
         await dataConnection.send(face_value);
 
         // if(gaze_LR > 0) { //ここの条件を変更することで注視時の音声入力をする条件を変更できる
@@ -351,7 +324,6 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       */
 
     });
-    //new-------------------------------------------------------------------
 
     peer.on('error', console.error);
   });
