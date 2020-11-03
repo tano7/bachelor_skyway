@@ -339,11 +339,11 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         //ここでarray.pushしていく
         await dataConnection.send(face_value);
 
-        if(gaze_LR > 0) { //ここの条件を変更することで注視時の音声入力をする条件を変更できる
-          recognition.start();
-        }else {
-          recognition.stop();
-        }
+        // if(gaze_LR > 0) { //ここの条件を変更することで注視時の音声入力をする条件を変更できる
+        //   recognition.start();
+        // }else {
+        //   recognition.stop();
+        // }
       }
 
       //音声認識を受け取る
