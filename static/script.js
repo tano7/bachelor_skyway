@@ -139,20 +139,20 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 
       //相互注視判定
       var i = 1;
-      while(i < 2) {
+      while(i < 3) {
         if(remote_face_LR[remote_face_LR.length - i] < 10 && remote_face_LR[remote_face_LR.length - i] > -10 && local_face_LR[local_face_LR.length - i] < 30 && local_face_UD[local_face_UD.length - i] > -30) {
           i++;
         }else {
           break;
         }
       }
-      if(i == 2) {
+      if(i == 3) {
         console.log('Mutual Gaze is a sign of love!');
         data.push('g');
         localVideo.muted = false;
-            localVideo.srcObject = localStream; //メディアプレーヤで再生するときに.srcObjectに代入しないといけない
-            localVideo.playsInline = true; 
-            localVideo.play().catch(console.error);
+        localVideo.srcObject = localStream; //メディアプレーヤで再生するときに.srcObjectに代入しないといけない
+        localVideo.playsInline = true; 
+        localVideo.play().catch(console.error);
       }else {
       localVideo.muted = true;
       localVideo.srcObject = localStream; //メディアプレーヤで再生するときに.srcObjectに代入しないといけない
