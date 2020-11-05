@@ -300,7 +300,6 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 
           else {
             localVideo.muted = false;
-            console.log(localVideo);
           //   localStream.getUserMedia({audio: false});
           }
 
