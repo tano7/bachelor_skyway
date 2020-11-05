@@ -151,7 +151,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         data.push('g');
       }else {
       localVideo.muted = false;
-      await localVideo.play().catch(console.error); //失敗したらコンソールエラー
+      localVideo.play().catch(console.error); //失敗したらコンソールエラー
       }
 
       ws.send(data); //Pythonにリモートデータ送信
@@ -288,7 +288,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
             data.push('g');
           }else {
             localVideo.muted = false;
-            await localVideo.play().catch(console.error); //失敗したらコンソールエラー
+            localVideo.play().catch(console.error); //失敗したらコンソールエラー
           }
 
           ws.send(data); //pythonにリモートデータ送信
