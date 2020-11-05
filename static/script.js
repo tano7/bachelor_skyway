@@ -149,8 +149,12 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       if(i == 2) {
         console.log('Mutual Gaze is a sign of love!');
         data.push('g');
+        localVideo.muted = false;
+            localVideo.srcObject = localStream; //メディアプレーヤで再生するときに.srcObjectに代入しないといけない
+            localVideo.playsInline = true; 
+            localVideo.play().catch(console.error);
       }else {
-      localVideo.muted = false;
+      localVideo.muted = true;
       localVideo.srcObject = localStream; //メディアプレーヤで再生するときに.srcObjectに代入しないといけない
       localVideo.playsInline = true; 
       localVideo.play().catch(console.error); //失敗したらコンソールエラー
@@ -288,10 +292,14 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
           if(i == 3) {
             console.log('Mutual Gaze is a sign of love!');
             data.push('g');
-          }else {
             localVideo.muted = false;
             localVideo.srcObject = localStream; //メディアプレーヤで再生するときに.srcObjectに代入しないといけない
-  localVideo.playsInline = true; 
+            localVideo.playsInline = true; 
+            localVideo.play().catch(console.error);
+          }else {
+            localVideo.muted = true;
+            localVideo.srcObject = localStream; //メディアプレーヤで再生するときに.srcObjectに代入しないといけない
+            localVideo.playsInline = true; 
             localVideo.play().catch(console.error); //失敗したらコンソールエラー
           }
 
