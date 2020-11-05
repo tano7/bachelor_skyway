@@ -149,15 +149,9 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       if(i == 3) {
         console.log('Mutual Gaze is a sign of love!');
         data.push('g');
-        localVideo.muted = false;
-        localVideo.srcObject = localStream; //メディアプレーヤで再生するときに.srcObjectに代入しないといけない
-        localVideo.playsInline = true; 
-        localVideo.play().catch(console.error);
+        localStream.getAudioTracks().forEach((track) => (track.enabled = true));
       }else {
-      localVideo.muted = true;
-      localVideo.srcObject = localStream; //メディアプレーヤで再生するときに.srcObjectに代入しないといけない
-      localVideo.playsInline = true; 
-      localVideo.play().catch(console.error); //失敗したらコンソールエラー
+        localStream.getAudioTracks().forEach((track) => (track.enabled = false));
       }
 
       ws.send(data); //Pythonにリモートデータ送信
@@ -292,15 +286,9 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
           if(i == 3) {
             console.log('Mutual Gaze is a sign of love!');
             data.push('g');
-            localVideo.muted = false;
-            localVideo.srcObject = localStream; //メディアプレーヤで再生するときに.srcObjectに代入しないといけない
-            localVideo.playsInline = true; 
-            localVideo.play().catch(console.error);
+            localStream.getAudioTracks().forEach((track) => (track.enabled = true));
           }else {
-            localVideo.muted = true;
-            localVideo.srcObject = localStream; //メディアプレーヤで再生するときに.srcObjectに代入しないといけない
-            localVideo.playsInline = true; 
-            localVideo.play().catch(console.error); //失敗したらコンソールエラー
+            localStream.getAudioTracks().forEach((track) => (track.enabled = false));
           }
 
           ws.send(data); //pythonにリモートデータ送信
