@@ -149,8 +149,15 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       if(i == 2) {
         console.log('Mutual Gaze is a sign of love!');
         data.push('g');
+      }
 
         //ここで通話ミュート解除する
+      //   localStream.getUserMedia({audio: true});
+      //   console.log(localStream);
+
+      else {
+      //   localStream.getUserMedia({audio: false});
+      localVideo.muted = false;
       }
 
       ws.send(data); //Pythonにリモートデータ送信
@@ -285,8 +292,16 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
           if(i == 3) {
             console.log('Mutual Gaze is a sign of love!');
             data.push('g');
+          }
 
             //ここでミュート解除する
+            //ここで通話ミュート解除する
+          //   localStream.getUserMedia({audio: true});
+
+          else {
+            localVideo.muted = false;
+            console.log(localVideo);
+          //   localStream.getUserMedia({audio: false});
           }
 
           ws.send(data); //pythonにリモートデータ送信
