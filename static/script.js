@@ -149,11 +149,9 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       if(i == 3) {
         console.log('Mutual Gaze is a sign of love!');
         data.push('g');
-        //localStream.getAudioTracks().forEach((track) => (track.enabled = true));
-        localStream.getAudioTracks()[0] = true;
+        localStream.getAudioTracks().forEach((track) => (track.enabled = true));
       }else {
-        //localStream.getAudioTracks().forEach((track) => (track.enabled = false));
-        localStream.getAudioTracks()[0] = false;
+        localStream.getAudioTracks().forEach((track) => (track.enabled = false));
       }
 
       ws.send(data); //Pythonにリモートデータ送信
@@ -288,11 +286,9 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
           if(i == 3) {
             console.log('Mutual Gaze is a sign of love!');
             data.push('g');
-            //localStream.getAudioTracks().forEach((track) => (track.enabled = true));
-            localStream.getAudioTracks()[0] = true;
+            localStream.getAudioTracks().forEach((track) => (track.enabled = true));
           }else {
-            //localStream.getAudioTracks().forEach((track) => (track.enabled = false));
-            localStream.getAudioTracks()[0] = false;
+            localStream.getAudioTracks().forEach((track) => (track.enabled = false));
           }
 
           ws.send(data); //pythonにリモートデータ送信
