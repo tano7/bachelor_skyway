@@ -151,6 +151,8 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         data.push('g');
       }else {
       localVideo.muted = false;
+      localVideo.srcObject = localStream; //メディアプレーヤで再生するときに.srcObjectに代入しないといけない
+      localVideo.playsInline = true; 
       localVideo.play().catch(console.error); //失敗したらコンソールエラー
       }
 
@@ -288,6 +290,8 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
             data.push('g');
           }else {
             localVideo.muted = false;
+            localVideo.srcObject = localStream; //メディアプレーヤで再生するときに.srcObjectに代入しないといけない
+  localVideo.playsInline = true; 
             localVideo.play().catch(console.error); //失敗したらコンソールエラー
           }
 
