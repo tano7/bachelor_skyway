@@ -132,18 +132,25 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       remote_face_LR.push(data[0]);
       remote_face_UD.push(data[1]);
 
+      if(remote_face_LR.length > 12) {
+        remote_face_LR.shift();
+        remote_face_UD.shift();
+      }
+
       //相互注視判定
       var i = 1;
-      while(i < 9) {
+      while(i < 2) {
         if(remote_face_LR[remote_face_LR.length - i] < 10 && remote_face_LR[remote_face_LR.length - i] > -10 && local_face_LR[local_face_LR.length - i] < 30 && local_face_UD[local_face_UD.length - i] > -30) {
           i++;
         }else {
           break;
         }
       }
-      if(i == 9) {
+      if(i == 2) {
         console.log('Mutual Gaze is a sign of love!');
         data.push('g');
+
+        //ここで通話ミュート解除する
       }
 
       ws.send(data); //Pythonにリモートデータ送信
@@ -169,6 +176,11 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 
       local_face_LR.push(face_value[0]);
       local_face_UD.push(face_value[1]);
+
+      if(local_face_LR.length > 12) {
+        local_face_LR.shift();
+        local_face_UD.shift();
+      }
     
       //視線情報をhtmlで表示するために#rcv要素にstring型で値を追加していく
       var string_txt = "face_dir_LR: " + face_value[0] + " face_dir_UD: " + face_value[1] + " gaze_LR: " + face_value[2] + " gaze_UD: " + face_value[3] + "<br>"
@@ -256,18 +268,25 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
           remote_face_LR.push(data[0]);
           remote_face_UD.push(data[1]);
 
+          if(remote_face_LR.length > 12) {
+            remote_face_LR.shift();
+            remote_face_UD.shift();
+          }
+
           //相互注視判定
           var i = 1;
-          while(i < 9) {
+          while(i < 3) {
             if(remote_face_LR[remote_face_LR.length - i] < 10 && remote_face_LR[remote_face_LR.length - i] > -10 && local_face_LR[local_face_LR.length - i] < 30 && local_face_UD[local_face_UD.length - i] > -30) {
               i++;
             }else {
               break;
             }
           }
-          if(i == 9) {
+          if(i == 3) {
             console.log('Mutual Gaze is a sign of love!');
             data.push('g');
+
+            //ここでミュート解除する
           }
 
           ws.send(data); //pythonにリモートデータ送信
@@ -290,6 +309,11 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         // var face_dir_UD = face_value[1];
         // var gaze_LR = face_value[2];
         // var gaze_UD = face_value[3];
+
+        if(local_face_LR.length > 12) {
+          local_face_LR.shift();
+          local_face_UD.shift();
+        }
         
         local_face_LR.push(face_value[0]);
         local_face_UD.push(face_value[1]);
