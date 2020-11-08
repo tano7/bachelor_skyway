@@ -140,7 +140,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       //相互注視判定
       var i = 1;
       while(i < 3) {
-        if(remote_face_LR[remote_face_LR.length - i] < 10 && remote_face_LR[remote_face_LR.length - i] > -10 && local_face_LR[local_face_LR.length - i] < 30 && local_face_UD[local_face_UD.length - i] > -30) {
+        if(remote_face_LR[remote_face_LR.length - i] < 10 && remote_face_LR[remote_face_LR.length - i] > -10 && local_face_LR[local_face_LR.length - i] < 10 && local_face_LR[local_face_LR.length - i] > -10) {
           i++;
         }else {
           break;
@@ -277,7 +277,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
           //相互注視判定
           var i = 1;
           while(i < 3) {
-            if(remote_face_LR[remote_face_LR.length - i] < 10 && remote_face_LR[remote_face_LR.length - i] > -10 && local_face_LR[local_face_LR.length - i] < 30 && local_face_UD[local_face_UD.length - i] > -30) {
+            if(remote_face_LR[remote_face_LR.length - i] < 10 && remote_face_LR[remote_face_LR.length - i] > -10 && local_face_LR[local_face_LR.length - i] < 10 && local_face_LR[local_face_LR.length - i] > -10) {
               i++;
             }else {
               break;
