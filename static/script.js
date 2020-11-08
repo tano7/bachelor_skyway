@@ -37,6 +37,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
   const messages = document.getElementById('js-messages');
   //const localText = document.getElementById('js-local-text'); //new
   //const sendTrigger = document.getElementById('js-send-trigger'); //new
+  const stopCall = document.getElementById('stop-call');
 
   const resultDiv = document.querySelector('#result-div'); //音声認識
   const createPeer = document.getElementById('create-peer'); //PeerID生成
@@ -99,6 +100,10 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 
     //電話を終わるトリガー
     closeTrigger.addEventListener('click', () => mediaConnection.close(true));
+    //ミュート
+    stopCall.addEventListener('click', () => {
+      localStream.getAudioTracks().forEach((track) => (track.enabled = false));
+    });
   });
 
   //チャット発信側--------------------------------------------------------
@@ -248,6 +253,12 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 
       //電話を終わるトリガー
       closeTrigger.addEventListener('click', () => mediaConnection.close(true));
+
+      //ミュート
+      stopCall.addEventListener('click', () => {
+      localStream.getAudioTracks().forEach((track) => (track.enabled = false));
+    });
+
     });
 
     //チャット受信側---------------------------------------------------------------
