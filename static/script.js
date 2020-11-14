@@ -68,7 +68,6 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
   //   debug: 3,
   // }));
 
-
   // これが電話をかけるトリガー--------------------------------------------------
   //これをクリックじゃなくせば電話のかけ方を変えられそう
   callTrigger.addEventListener('click', () => {
@@ -111,6 +110,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
   connectTrigger.addEventListener('click', () => {
     // Note that you need to ensure the peer has connected to signaling server
     // before using methods of peer instance.
+    recognition.start();
     if (!peer.open) {
       return;
     }
@@ -130,7 +130,12 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     //送られたデータを表示する処理
     dataConnection.on('data', data => { //on.'data'でデータが送られた時に自動的に発火する
     if(data[0] == 'v') { //声が送られた場合vを受け取る
-      messages.textContent += 'voice recieve\n';
+    
+      speechdata = [remote_face_LR[remote_face_LR.length - 1], remote_face_UD[remote_face_UD.length - 1], 0, 0, 'v'];
+      messages.textContent += `voice recieve. face_dir_LR: ${speechdata[0]} face_dir_UD: ${speechdata[1]}`;
+
+      ws.send(speechdata);
+
     }else {
       messages.textContent += `face_dir_LR: ${data[0]} face_dir_UD: ${data[1]} gazeLR: ${data[2]} gazeUD: ${data[3]}\n`; //$dataに送られてきたデータが入っている．messageに蓄積された内容が入っている
 
@@ -155,6 +160,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         console.log('Mutual Gaze is a sign of love!');
         data.push('g');
         localStream.getAudioTracks().forEach((track) => (track.enabled = true));
+        //recognition.stop();
       }else {
         //localStream.getAudioTracks().forEach((track) => (track.enabled = false));
       }
@@ -203,11 +209,10 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     }
 
     //音声認識を受け取る
-    /*
     recognition.onresult = (event) => {
       let interimTranscript = ''; // 暫定(灰色)の認識結果
       for (let i = event.resultIndex; i < event.results.length; i++) {
-        let transcript = event.results[i][0].transcript;
+        let transcript = event.results[i][0].transcript; //event.result[i][0].transcriptに結果が入っている.
         if (event.results[i].isFinal) { //isFinalで終了したかどうかを判定
           finalTranscript += transcript;
           dataConnection.send("v");
@@ -216,8 +221,9 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         }
       }
       resultDiv.innerHTML = finalTranscript + '<i style="color:#ddd;">' + interimTranscript + '</i>';
+      console.log(recognition);
     }
-    */
+
   });
 
   //こっから呼び出される方---------------------------------------------------------
@@ -273,7 +279,10 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 
       dataConnection.on('data', data => {
         if(data[0] == 'v') {
-          messages.textContent += 'voice recieve\n';
+          speechdata = [remote_face_LR[remote_face_LR.length - 1], remote_face_UD[remote_face_UD.length - 1], 0, 0, 'v'];
+          messages.textContent += `voice recieve. face_dir_LR: ${speechdata[0]} face_dir_UD: ${speechdata[1]}`;
+
+          ws.send(speechdata);
         }else {
           messages.textContent += `face_dir_LR: ${data[0]} face_dir_UD: ${data[1]} gazeLR: ${data[2]} gazeUD: ${data[3]}\n`;
 
@@ -344,7 +353,6 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       }
 
       //音声認識を受け取る
-      /*
       recognition.onresult = (event) => {
         let interimTranscript = ''; // 暫定(灰色)の認識結果
         for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -358,7 +366,6 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         }
         resultDiv.innerHTML = finalTranscript + '<i style="color:#ddd;">' + interimTranscript + '</i>';
       }
-      */
 
     });
 
