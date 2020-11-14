@@ -73,6 +73,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
   callTrigger.addEventListener('click', () => {
     // Note that you need to ensure the peer has connected to signaling server
     // before using methods of peer instance.
+    localStream.getAudioTracks().forEach((track) => (track.enabled = true));
     if (!peer.open) {
       return;
     }
@@ -132,7 +133,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     if(data[0] == 'v') { //声が送られた場合vを受け取る
     
       speechdata = [remote_face_LR[remote_face_LR.length - 1], remote_face_UD[remote_face_UD.length - 1], 0, 0, 'v'];
-      messages.textContent += `voice recieve. face_dir_LR: ${speechdata[0]} face_dir_UD: ${speechdata[1]}`;
+      messages.textContent += `voice recieve. face_dir_LR: ${speechdata[0]} face_dir_UD: ${speechdata[1]}\n`;
 
       ws.send(speechdata);
 
@@ -244,6 +245,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       mediaConnection.answer(localStream); //localStreamで応答する
       mediaConnection.on('stream', async stream => {
         messages.textContent += `=== Call has been connected ===\n`;
+        localStream.getAudioTracks().forEach((track) => (track.enabled = true));
         //リモートの相手を呼び出し先として表示
         remoteVideo.srcObject = stream;
         remoteVideo.playsInline = true;
@@ -275,12 +277,13 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         //ws.sendで取得した値を動的に取得するためにwebsocketに送信するデータを格納する命令を出す
         message='dummy';
         ws.send(message);
+        //recognition.start();
       });
 
       dataConnection.on('data', data => {
         if(data[0] == 'v') {
           speechdata = [remote_face_LR[remote_face_LR.length - 1], remote_face_UD[remote_face_UD.length - 1], 0, 0, 'v'];
-          messages.textContent += `voice recieve. face_dir_LR: ${speechdata[0]} face_dir_UD: ${speechdata[1]}`;
+          messages.textContent += `voice recieve. face_dir_LR: ${speechdata[0]} face_dir_UD: ${speechdata[1]}\n`;
 
           ws.send(speechdata);
         }else {
@@ -307,6 +310,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
             console.log('Mutual Gaze is a sign of love!');
             data.push('g');
             localStream.getAudioTracks().forEach((track) => (track.enabled = true));
+            //recognition.stop();
           }else {
             //localStream.getAudioTracks().forEach((track) => (track.enabled = false));
           }
