@@ -111,7 +111,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
   connectTrigger.addEventListener('click', () => {
     // Note that you need to ensure the peer has connected to signaling server
     // before using methods of peer instance.
-    recognition.start();
+    //recognition.start();
     if (!peer.open) {
       return;
     }
