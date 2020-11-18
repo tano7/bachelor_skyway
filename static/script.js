@@ -111,7 +111,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
   connectTrigger.addEventListener('click', () => {
     // Note that you need to ensure the peer has connected to signaling server
     // before using methods of peer instance.
-    //recognition.start();
+    recognition.start();
     if (!peer.open) {
       return;
     }
@@ -200,12 +200,6 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       $("#rcv").append(string_txt)      
       //ここでdataconnectionすることで撮った瞬間のデータを送る
       await dataConnection.send(face_value);
-      
-      // if(gaze_LR > 0) { //ここの条件を変更することで注視時の音声入力をする条件を変更できる
-      //   recognition.start();
-      // }else {
-      //   recognition.stop();
-      // }
 
     }
 
@@ -222,7 +216,6 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         }
       }
       resultDiv.innerHTML = finalTranscript + '<i style="color:#ddd;">' + interimTranscript + '</i>';
-      console.log(recognition);
     }
 
   });
@@ -277,7 +270,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         //ws.sendで取得した値を動的に取得するためにwebsocketに送信するデータを格納する命令を出す
         message='dummy';
         ws.send(message);
-        //recognition.start();
+        recognition.start();
       });
 
       dataConnection.on('data', data => {
@@ -349,11 +342,6 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         $("#rcv").append(string_txt)  
         await dataConnection.send(face_value);
 
-        // if(gaze_LR > 0) { //ここの条件を変更することで注視時の音声入力をする条件を変更できる
-        //   recognition.start();
-        // }else {
-        //   recognition.stop();
-        // }
       }
 
       //音声認識を受け取る
