@@ -23,6 +23,9 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
   var local_face_UD = [0];
   var remote_face_LR = [0];
   var remote_face_UD = [0];
+
+  var last_time;
+  var now_time;
   
   //htmlにある要素をjsで使用するために紐付ける
   const localVideo = document.getElementById('js-local-stream');
@@ -148,6 +151,8 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         remote_face_UD.shift();
       }
 
+      now_time = Date.now();
+
       //相互注視判定
       var i = 1;
       while(i < 3) {
@@ -161,9 +166,13 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         console.log('Mutual Gaze is a sign of love!');
         data.push('g');
         localStream.getAudioTracks().forEach((track) => (track.enabled = true));
+        last_time = Date.now();
         //recognition.stop();
       }else {
-        //localStream.getAudioTracks().forEach((track) => (track.enabled = false));
+        if(now_time - last_time > 20000) {
+          localStream.getAudioTracks().forEach((track) => (track.enabled = false));
+          console.log('Fin Call');
+        }
       }
 
       ws.send(data); //Pythonにリモートデータ送信
@@ -200,6 +209,12 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       $("#rcv").append(string_txt)      
       //ここでdataconnectionすることで撮った瞬間のデータを送る
       await dataConnection.send(face_value);
+      
+      // if(gaze_LR > 0) { //ここの条件を変更することで注視時の音声入力をする条件を変更できる
+      //   recognition.start();
+      // }else {
+      //   recognition.stop();
+      // }
 
     }
 
@@ -211,11 +226,13 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         if (event.results[i].isFinal) { //isFinalで終了したかどうかを判定
           finalTranscript += transcript;
           dataConnection.send("v");
+          last_time = Date.now();
         } else {
           interimTranscript = transcript;
         }
       }
       resultDiv.innerHTML = finalTranscript + '<i style="color:#ddd;">' + interimTranscript + '</i>';
+      console.log(recognition);
     }
 
   });
@@ -290,6 +307,8 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
             remote_face_UD.shift();
           }
 
+          now_time = Date.now();
+
           //相互注視判定
           var i = 1;
           while(i < 3) {
@@ -303,9 +322,13 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
             console.log('Mutual Gaze is a sign of love!');
             data.push('g');
             localStream.getAudioTracks().forEach((track) => (track.enabled = true));
+            last_time = Date.now();
             //recognition.stop();
           }else {
-            //localStream.getAudioTracks().forEach((track) => (track.enabled = false));
+            if(now_time - last_time > 20000) {
+              localStream.getAudioTracks().forEach((track) => (track.enabled = false));
+              console.log('Fin Call');
+            }
           }
 
           ws.send(data); //pythonにリモートデータ送信
@@ -342,6 +365,11 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         $("#rcv").append(string_txt)  
         await dataConnection.send(face_value);
 
+        // if(gaze_LR > 0) { //ここの条件を変更することで注視時の音声入力をする条件を変更できる
+        //   recognition.start();
+        // }else {
+        //   recognition.stop();
+        // }
       }
 
       //音声認識を受け取る
@@ -352,6 +380,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
           if (event.results[i].isFinal) { //isFinalで終了したかどうかを判定
             finalTranscript += transcript;
             dataConnection.send("v");
+            last_time = Date.now();
           } else {
             interimTranscript = transcript;
           }
