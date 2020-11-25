@@ -24,8 +24,12 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
   var remote_face_LR = [0];
   var remote_face_UD = [0];
 
+  //時間記録用
   var last_time;
   var now_time;
+
+  //通話判定用 0 or 1
+  var callJudge = 0;
   
   //htmlにある要素をjsで使用するために紐付ける
   const localVideo = document.getElementById('js-local-stream');
@@ -76,7 +80,8 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
   callTrigger.addEventListener('click', () => {
     // Note that you need to ensure the peer has connected to signaling server
     // before using methods of peer instance.
-    localStream.getAudioTracks().forEach((track) => (track.enabled = true));
+    localStream.getAudioTracks().forEach((track) => (track.enabled = false));
+    callJudge = 0;
     if (!peer.open) {
       return;
     }
@@ -106,6 +111,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     //ミュート
     stopCall.addEventListener('click', () => {
       localStream.getAudioTracks().forEach((track) => (track.enabled = false));
+      callJudge = 0;
     });
   });
 
@@ -114,7 +120,8 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
   connectTrigger.addEventListener('click', () => {
     // Note that you need to ensure the peer has connected to signaling server
     // before using methods of peer instance.
-    recognition.start();
+    //recognition.start();
+    setInterval(recstart, 10000);
     if (!peer.open) {
       return;
     }
@@ -135,6 +142,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     dataConnection.on('data', data => { //on.'data'でデータが送られた時に自動的に発火する
     if(data[0] == 'v') { //声が送られた場合vを受け取る
     
+
       speechdata = [remote_face_LR[remote_face_LR.length - 1], remote_face_UD[remote_face_UD.length - 1], 0, 0, 'v'];
       messages.textContent += `voice recieve. face_dir_LR: ${speechdata[0]} face_dir_UD: ${speechdata[1]}\n`;
 
@@ -164,15 +172,23 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       }
       if(i == 3) {
         console.log('Mutual Gaze is a sign of love!');
-        data.push('g');
+        //data.push('g');
         localStream.getAudioTracks().forEach((track) => (track.enabled = true));
+        callJudge = 1;
         last_time = Date.now();
         //recognition.stop();
       }else {
         if(now_time - last_time > 20000) {
           localStream.getAudioTracks().forEach((track) => (track.enabled = false));
+          callJudge = 0;
           console.log('Fin Call');
         }
+      }
+
+      if(callJudge == 1) {
+        data.push('g');
+      } else {
+        data.push('e');
       }
 
       ws.send(data); //Pythonにリモートデータ送信
@@ -210,11 +226,6 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       //ここでdataconnectionすることで撮った瞬間のデータを送る
       await dataConnection.send(face_value);
       
-      // if(gaze_LR > 0) { //ここの条件を変更することで注視時の音声入力をする条件を変更できる
-      //   recognition.start();
-      // }else {
-      //   recognition.stop();
-      // }
 
     }
 
@@ -225,14 +236,21 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         let transcript = event.results[i][0].transcript; //event.result[i][0].transcriptに結果が入っている.
         if (event.results[i].isFinal) { //isFinalで終了したかどうかを判定
           finalTranscript += transcript;
-          dataConnection.send("v");
+          if(callJudge == 0) {
+            dataConnection.send("v");
+          }
           last_time = Date.now();
         } else {
           interimTranscript = transcript;
         }
       }
       resultDiv.innerHTML = finalTranscript + '<i style="color:#ddd;">' + interimTranscript + '</i>';
-      console.log(recognition);
+    }
+
+    var recstart = function() {
+      recognition.stop();
+      recognition.start();
+      console.log('recognition');
     }
 
   });
@@ -255,7 +273,8 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       mediaConnection.answer(localStream); //localStreamで応答する
       mediaConnection.on('stream', async stream => {
         messages.textContent += `=== Call has been connected ===\n`;
-        localStream.getAudioTracks().forEach((track) => (track.enabled = true));
+        localStream.getAudioTracks().forEach((track) => (track.enabled = false));
+        callJudge = 0;
         //リモートの相手を呼び出し先として表示
         remoteVideo.srcObject = stream;
         remoteVideo.playsInline = true;
@@ -275,6 +294,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       //ミュート
       stopCall.addEventListener('click', () => {
       localStream.getAudioTracks().forEach((track) => (track.enabled = false));
+      callJudge = 0;
     });
 
     });
@@ -287,7 +307,8 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         //ws.sendで取得した値を動的に取得するためにwebsocketに送信するデータを格納する命令を出す
         message='dummy';
         ws.send(message);
-        recognition.start();
+        //recognition.start();
+        setInterval(recstart, 10000);
       });
 
       dataConnection.on('data', data => {
@@ -320,15 +341,23 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
           }
           if(i == 3) {
             console.log('Mutual Gaze is a sign of love!');
-            data.push('g');
+            //data.push('g');
             localStream.getAudioTracks().forEach((track) => (track.enabled = true));
+            callJudge = 1;
             last_time = Date.now();
             //recognition.stop();
           }else {
             if(now_time - last_time > 20000) {
               localStream.getAudioTracks().forEach((track) => (track.enabled = false));
+              callJudge = 0;
               console.log('Fin Call');
             }
+          }
+
+          if(callJudge == 1) {
+            data.push('g');
+          }else {
+            data.push('e');
           }
 
           ws.send(data); //pythonにリモートデータ送信
@@ -365,11 +394,6 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         $("#rcv").append(string_txt)  
         await dataConnection.send(face_value);
 
-        // if(gaze_LR > 0) { //ここの条件を変更することで注視時の音声入力をする条件を変更できる
-        //   recognition.start();
-        // }else {
-        //   recognition.stop();
-        // }
       }
 
       //音声認識を受け取る
@@ -379,13 +403,21 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
           let transcript = event.results[i][0].transcript;
           if (event.results[i].isFinal) { //isFinalで終了したかどうかを判定
             finalTranscript += transcript;
-            dataConnection.send("v");
+            if(callJudge == 0) {
+              dataConnection.send("v");
+            }
             last_time = Date.now();
           } else {
             interimTranscript = transcript;
           }
         }
         resultDiv.innerHTML = finalTranscript + '<i style="color:#ddd;">' + interimTranscript + '</i>';
+      }
+
+      var recstart = function() {
+        recognition.stop();
+        recognition.start();
+        console.log('recognition');
       }
 
     });
