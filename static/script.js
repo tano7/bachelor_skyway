@@ -121,7 +121,6 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     // Note that you need to ensure the peer has connected to signaling server
     // before using methods of peer instance.
     //recognition.start();
-    setInterval(recstart, 10000);
     if (!peer.open) {
       return;
     }
@@ -132,6 +131,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     //初めて繋がった時にメッセージ送る
     dataConnection.once('open', async () => {
       messages.textContent += `=== DataConnection has been opened ===\n`;
+      setInterval(recstart, 10000);
       //ws.sendで取得した値を動的に取得するためにwebsocketに送信するデータを格納する命令を出す
       message='dummy';
       ws.send(message);
