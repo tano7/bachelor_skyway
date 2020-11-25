@@ -131,7 +131,8 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     //初めて繋がった時にメッセージ送る
     dataConnection.once('open', async () => {
       messages.textContent += `=== DataConnection has been opened ===\n`;
-      setInterval(recstart, 10000);
+      recognition.start();
+      //setInterval(recstart, 10000);
       //ws.sendで取得した値を動的に取得するためにwebsocketに送信するデータを格納する命令を出す
       message='dummy';
       ws.send(message);
@@ -247,10 +248,13 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       resultDiv.innerHTML = finalTranscript + '<i style="color:#ddd;">' + interimTranscript + '</i>';
     }
 
-    var recstart = function() {
-      recognition.stop();
+    // var recstart = function() {
+    //   recognition.start();
+    // }
+
+    recognition.onend = function() {
       recognition.start();
-      console.log('recognition');
+      console.log('音声認識し直し');
     }
 
   });
@@ -304,11 +308,11 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     peer.on('connection', dataConnection => {
       dataConnection.once('open', async () => {
         messages.textContent += `=== DataConnection has been opened ===\n`;
+        recognition.start();
+        //setInterval(recstart, 10000);
         //ws.sendで取得した値を動的に取得するためにwebsocketに送信するデータを格納する命令を出す
         message='dummy';
         ws.send(message);
-        //recognition.start();
-        setInterval(recstart, 10000);
       });
 
       dataConnection.on('data', data => {
@@ -414,10 +418,9 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         resultDiv.innerHTML = finalTranscript + '<i style="color:#ddd;">' + interimTranscript + '</i>';
       }
 
-      var recstart = function() {
-        recognition.stop();
+      recognition.onend = function() {
         recognition.start();
-        console.log('recognition');
+        console.log('音声認識し直し');
       }
 
     });
