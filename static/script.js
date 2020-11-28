@@ -140,6 +140,9 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       //messages.textContent += `voice recieve. face_dir_LR: ${speechdata[0]} face_dir_UD: ${speechdata[1]}\n`;
       messages.textContent += `voice recieved.\n`;
       ws.send(speechdata);
+
+      console.log(callJudge);
+          console.log(speechdata);
     }else {
       //messages.textContent += `face_dir_LR: ${data[0]} face_dir_UD: ${data[1]} gazeLR: ${data[2]} gazeUD: ${data[3]}\n`; //$dataに送られてきたデータが入っている．messageに蓄積された内容が入っている
       remote_face_LR.push(data[0]);
@@ -177,6 +180,8 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       }
 
       ws.send(data); //Pythonにリモートデータ送信
+      console.log(callJudge);
+          console.log(data);
     }
   });
 
