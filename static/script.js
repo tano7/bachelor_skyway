@@ -61,7 +61,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       audio: true,
       video: false,
     })
-    .catch(console.error); //失敗したらコンソールエラーを投げる
+    .catch(console.error);
 
   //ローカルで音声ビデオを読み込む．muted・srcObject・playInlineはセットらしい
   localVideo.muted = true; //ミュートにするか否か
@@ -75,8 +75,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
   //   debug: 3,
   // }));
 
-  // これが電話をかけるトリガー--------------------------------------------------
-  //これをクリックじゃなくせば電話のかけ方を変えられそう
+  // これが電話をかけるトリガー--------------------------------------------------------
   callTrigger.addEventListener('click', () => {
     // Note that you need to ensure the peer has connected to signaling server
     // before using methods of peer instance.
@@ -85,11 +84,8 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     if (!peer.open) {
       return;
     }
-
     //接続先のPeerIDを指定してmediaConnectionを作成
-    //発信側
     const mediaConnection = peer.call(remoteId.value, localStream);
-
     //接続先Peerへのメディアチャンネル接続を管理するクラス
     mediaConnection.on('stream', async stream => {
       messages.textContent += `=== Call has been connected ===\n`;
@@ -98,14 +94,12 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       remoteVideo.playsInline = true;
       await remoteVideo.play().catch(console.error);
     });
-
     //終了する時の処理
     mediaConnection.once('close', () => {
       remoteVideo.srcObject.getTracks().forEach(track => track.stop());
       remoteVideo.srcObject = null;
       messages.textContent += `=== Call has been disconnected ===\n`;
     });
-
     //電話を終わるトリガー
     closeTrigger.addEventListener('click', () => mediaConnection.close(true));
     //ミュート
@@ -115,7 +109,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     });
   });
 
-  //チャット発信側--------------------------------------------------------
+  //チャット発信側-----------------------------------------------------------------
   // チャットを行うトリガー
   connectTrigger.addEventListener('click', () => {
     // Note that you need to ensure the peer has connected to signaling server
@@ -132,8 +126,6 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     dataConnection.once('open', async () => {
       messages.textContent += `=== DataConnection has been opened ===\n`;
       recognition.start();
-      //setInterval(recstart, 10000);
-      //ws.sendで取得した値を動的に取得するためにwebsocketに送信するデータを格納する命令を出す
       message='dummy';
       ws.send(message);
     });
@@ -142,19 +134,14 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     //送られたデータを表示する処理
     dataConnection.on('data', data => { //on.'data'でデータが送られた時に自動的に発火する
     if(data[0] == 'v') { //声が送られた場合vを受け取る
-    
-
       speechdata = [remote_face_LR[remote_face_LR.length - 1], remote_face_UD[remote_face_UD.length - 1], 0, 0, 'v'];
-      messages.textContent += `voice recieve. face_dir_LR: ${speechdata[0]} face_dir_UD: ${speechdata[1]}\n`;
-
+      //messages.textContent += `voice recieve. face_dir_LR: ${speechdata[0]} face_dir_UD: ${speechdata[1]}\n`;
+      messages.textContent += `voice recieved.\n`;
       ws.send(speechdata);
-
     }else {
-      messages.textContent += `face_dir_LR: ${data[0]} face_dir_UD: ${data[1]} gazeLR: ${data[2]} gazeUD: ${data[3]}\n`; //$dataに送られてきたデータが入っている．messageに蓄積された内容が入っている
-
+      //messages.textContent += `face_dir_LR: ${data[0]} face_dir_UD: ${data[1]} gazeLR: ${data[2]} gazeUD: ${data[3]}\n`; //$dataに送られてきたデータが入っている．messageに蓄積された内容が入っている
       remote_face_LR.push(data[0]);
       remote_face_UD.push(data[1]);
-
       if(remote_face_LR.length > 12) {
         remote_face_LR.shift();
         remote_face_UD.shift();
@@ -172,24 +159,20 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         }
       }
       if(i == 3) {
-        console.log('Mutual Gaze is a sign of love!');
-        //data.push('g');
+        console.log('Mutual Gaze Detected.');
         localStream.getAudioTracks().forEach((track) => (track.enabled = true));
         callJudge = 1;
         last_time = Date.now();
-        //recognition.stop();
-      }else {
-        if(now_time - last_time > 20000) {
-          localStream.getAudioTracks().forEach((track) => (track.enabled = false));
-          callJudge = 0;
-          console.log('Fin Call');
-        }
+      }else if (now_time - last_time > 20000) {
+        callJudge = 0;
       }
 
-      if(callJudge == 1) {
-        data.push('g');
-      } else {
-        data.push('e');
+      if(callJudge == 0 && data[4] == 0) {
+        localStream.getAudioTracks().forEach((track) => (track.enabled = false));
+        console.log('Fin Call');
+        data[4] = 'e';
+      }else {
+        data[4] = 'g';
       }
 
       ws.send(data); //Pythonにリモートデータ送信
@@ -208,26 +191,19 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 
     ws.onmessage = async function(x){
       var face_value = JSON.parse(x.data); //x.dataで送信された値の中身とってくる
-      // var face_dir_LR = face_value[0];
-      // var face_dir_UD = face_value[1];
-      // var gaze_LR = face_value[2];
-      // var gaze_UD = face_value[3];
-
-      local_face_LR.push(face_value[0]);
-      local_face_UD.push(face_value[1]);
 
       if(local_face_LR.length > 12) {
         local_face_LR.shift();
         local_face_UD.shift();
       }
-    
-      //視線情報をhtmlで表示するために#rcv要素にstring型で値を追加していく
-      var string_txt = "face_dir_LR: " + face_value[0] + " face_dir_UD: " + face_value[1] + " gaze_LR: " + face_value[2] + " gaze_UD: " + face_value[3] + "<br>"
-      $("#rcv").append(string_txt)      
-      //ここでdataconnectionすることで撮った瞬間のデータを送る
-      await dataConnection.send(face_value);
-      
+      local_face_LR.push(face_value[0]);
+      local_face_UD.push(face_value[1]);
+      face_value.push(callJudge);
 
+      //視線情報をhtmlで表示するために#rcv要素にstring型で値を追加していく
+      // var string_txt = "face_dir_LR: " + face_value[0] + " face_dir_UD: " + face_value[1] + " gaze_LR: " + face_value[2] + " gaze_UD: " + face_value[3] + "<br>"
+      // $("#rcv").append(string_txt)
+      await dataConnection.send(face_value);
     }
 
     //音声認識を受け取る
@@ -247,16 +223,6 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       }
       resultDiv.innerHTML = finalTranscript + '<i style="color:#ddd;">' + interimTranscript + '</i>';
     }
-
-    // var recstart = function() {
-    //   recognition.start();
-    // }
-
-    recognition.onend = function() {
-      recognition.start();
-      console.log('音声認識し直し');
-    }
-
   });
 
   //こっから呼び出される方---------------------------------------------------------
@@ -284,23 +250,19 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         remoteVideo.playsInline = true;
         await remoteVideo.play().catch(console.error);
       });
-
       //終了する時の処理
       mediaConnection.once('close', () => {
         remoteVideo.srcObject.getTracks().forEach(track => track.stop());
         remoteVideo.srcObject = null;
         messages.textContent += `=== Call has been disconnected ===\n`;
       });
-
       //電話を終わるトリガー
       closeTrigger.addEventListener('click', () => mediaConnection.close(true));
-
       //ミュート
       stopCall.addEventListener('click', () => {
-      localStream.getAudioTracks().forEach((track) => (track.enabled = false));
-      callJudge = 0;
-    });
-
+        localStream.getAudioTracks().forEach((track) => (track.enabled = false));
+        callJudge = 0;
+      });
     });
 
     //チャット受信側---------------------------------------------------------------
@@ -309,8 +271,6 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       dataConnection.once('open', async () => {
         messages.textContent += `=== DataConnection has been opened ===\n`;
         recognition.start();
-        //setInterval(recstart, 10000);
-        //ws.sendで取得した値を動的に取得するためにwebsocketに送信するデータを格納する命令を出す
         message='dummy';
         ws.send(message);
       });
@@ -318,15 +278,13 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       dataConnection.on('data', data => {
         if(data[0] == 'v') {
           speechdata = [remote_face_LR[remote_face_LR.length - 1], remote_face_UD[remote_face_UD.length - 1], 0, 0, 'v'];
-          messages.textContent += `voice recieve. face_dir_LR: ${speechdata[0]} face_dir_UD: ${speechdata[1]}\n`;
-
+          //messages.textContent += `voice recieve. face_dir_LR: ${speechdata[0]} face_dir_UD: ${speechdata[1]}\n`;
+          messages.textContent += `voice recieved.\n`;
           ws.send(speechdata);
         }else {
-          messages.textContent += `face_dir_LR: ${data[0]} face_dir_UD: ${data[1]} gazeLR: ${data[2]} gazeUD: ${data[3]}\n`;
-
+          //messages.textContent += `face_dir_LR: ${data[0]} face_dir_UD: ${data[1]} gazeLR: ${data[2]} gazeUD: ${data[3]}\n`;
           remote_face_LR.push(data[0]);
           remote_face_UD.push(data[1]);
-
           if(remote_face_LR.length > 12) {
             remote_face_LR.shift();
             remote_face_UD.shift();
@@ -344,26 +302,21 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
             }
           }
           if(i == 3) {
-            console.log('Mutual Gaze is a sign of love!');
-            //data.push('g');
+            console.log('Mutual Gaze Detected.');
             localStream.getAudioTracks().forEach((track) => (track.enabled = true));
             callJudge = 1;
             last_time = Date.now();
-            //recognition.stop();
-          }else {
-            if(now_time - last_time > 20000) {
-              localStream.getAudioTracks().forEach((track) => (track.enabled = false));
-              callJudge = 0;
-              console.log('Fin Call');
-            }
+          }else if(now_time - last_time > 10000) {
+            callJudge = 0;
           }
 
-          if(callJudge == 1) {
-            data.push('g');
+          if(callJudge == 0 && data[4] == 0) {
+            localStream.getAudioTracks().forEach((track) => (track.enabled = false));
+            console.log('Fin Call');
+            data[4] = 'e';
           }else {
-            data.push('e');
+            data[4] = 'g';
           }
-
           ws.send(data); //pythonにリモートデータ送信
         }
       });
@@ -380,24 +333,19 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 
       ws.onmessage = async function(x){
         var face_value = JSON.parse(x.data); //x.dataで送信された値の中身とってくる
-        // var face_dir_LR = face_value[0];
-        // var face_dir_UD = face_value[1];
-        // var gaze_LR = face_value[2];
-        // var gaze_UD = face_value[3];
 
         if(local_face_LR.length > 12) {
           local_face_LR.shift();
           local_face_UD.shift();
         }
-        
         local_face_LR.push(face_value[0]);
         local_face_UD.push(face_value[1]);
+        face_value.push(callJudge);
       
         //視線情報をhtmlで表示するために#rcv要素にstring型で値を追加していく
-        var string_txt = "face_dir_LR: " + face_value[0] + " face_dir_UD: " + face_value[1] + " gaze_LR: " + face_value[2] + " gaze_UD: " + face_value[3] + "<br>"
-        $("#rcv").append(string_txt)  
+        // var string_txt = "face_dir_LR: " + face_value[0] + " face_dir_UD: " + face_value[1] + " gaze_LR: " + face_value[2] + " gaze_UD: " + face_value[3] + "<br>"
+        // $("#rcv").append(string_txt)  
         await dataConnection.send(face_value);
-
       }
 
       //音声認識を受け取る
@@ -416,11 +364,6 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
           }
         }
         resultDiv.innerHTML = finalTranscript + '<i style="color:#ddd;">' + interimTranscript + '</i>';
-      }
-
-      recognition.onend = function() {
-        recognition.start();
-        console.log('音声認識し直し');
       }
 
     });
