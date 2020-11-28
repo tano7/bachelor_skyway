@@ -244,6 +244,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 
   //正常に接続した時の処理
   createPeer.addEventListener('click', () => { 
+    console.log('peer');
     const peer_id = document.getElementById('peer-id');
     const peer = (window.peer = new Peer(peer_id.value, {
       key: window.__SKYWAY_KEY__,
