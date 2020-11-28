@@ -141,9 +141,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       //messages.textContent += `voice recieve. face_dir_LR: ${speechdata[0]} face_dir_UD: ${speechdata[1]}\n`;
       messages.textContent += `voice recieved.\n`;
       ws.send(speechdata);
-
-      // console.log(callJudge);
-      //     console.log();
+      console.log('voice recieve.')
     }else {
       //messages.textContent += `face_dir_LR: ${data[0]} face_dir_UD: ${data[1]} gazeLR: ${data[2]} gazeUD: ${data[3]}\n`; //$dataに送られてきたデータが入っている．messageに蓄積された内容が入っている
       remote_face_LR.push(data[0]);
@@ -153,9 +151,9 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         remote_face_UD.shift();
       }
 
-      now_time = Date.now();
-
       remote_callJudge = data[4];
+
+      now_time = Date.now();
 
       //相互注視判定
       var i = 1;
@@ -167,15 +165,16 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         }
       }
       if(i == 3) {
-        //console.log('Mutual Gaze Detected.');
+        console.log('Mutual Gaze Detected.');
         localStream.getAudioTracks().forEach((track) => (track.enabled = true));
         callJudge = 1;
         last_time = Date.now();
-      }else if (now_time - last_time > 10000) {
+      }else if (now_time - last_time > 20000) {
         callJudge = 0;
+        console.log('callJudge = 0');
       }
 
-      if(callJudge == 0 && data[4] == 0) {
+      if(callJudge == 0 && remote_callJudge == 0) {
         localStream.getAudioTracks().forEach((track) => (track.enabled = false));
         data[4] = 'e';
       }else {
@@ -224,7 +223,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
           finalTranscript += transcript;
           if(callJudge == 0 && remote_callJudge == 0) {
             dataConnection.send("v");
-            console.log('senddd');
+            console.log('voice sent.');
           }
           last_time = Date.now();
           //recognition.stop();
@@ -235,9 +234,8 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       resultDiv.innerHTML = finalTranscript + '<i style="color:#ddd;">' + interimTranscript + '</i>';
     }
     recognition.onend = function(){
-      //console.log('Recognition Finished.');
       recognition.start();
-
+      console.log('Recognition Restart.');
     }
 
   });
@@ -299,8 +297,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
           //messages.textContent += `voice recieve. face_dir_LR: ${speechdata[0]} face_dir_UD: ${speechdata[1]}\n`;
           messages.textContent += `voice recieved.\n`;
           ws.send(speechdata);
-          // console.log(callJudge);
-          // console.log(data);
+          console.log('voice recieved.');
         }else {
           //messages.textContent += `face_dir_LR: ${data[0]} face_dir_UD: ${data[1]} gazeLR: ${data[2]} gazeUD: ${data[3]}\n`;
           remote_face_LR.push(data[0]);
@@ -324,15 +321,16 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
             }
           }
           if(i == 3) {
-            //console.log('Mutual Gaze Detected.');
+            console.log('Mutual Gaze Detected.');
             localStream.getAudioTracks().forEach((track) => (track.enabled = true));
             callJudge = 1;
             last_time = Date.now();
           }else if(now_time - last_time > 10000) {
             callJudge = 0;
+            console.log('callJudge = 0');
           }
 
-          if(callJudge == 0 && data[4] == 0) {
+          if(callJudge == 0 && remote_callJudge == 0) {
             localStream.getAudioTracks().forEach((track) => (track.enabled = false));
             //console.log('Fin Call');
             data[4] = 'e';
@@ -340,7 +338,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
             data[4] = 'g';
           }
           ws.send(data); //pythonにリモートデータ送信
-          console.log(callJudge);
+          //console.log(callJudge);
           //console.log(data);
         }
       });
@@ -381,7 +379,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
             finalTranscript += transcript;
             if(callJudge == 0 && remote_callJudge == 0) {
               dataConnection.send("v");
-              console.log('senddd');
+              console.log('voice sent.');
             }
             last_time = Date.now();
             //recogtnition.stop();
