@@ -142,7 +142,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       ws.send(speechdata);
 
       console.log(callJudge);
-          console.log(speechdata);
+          console.log();
     }else {
       //messages.textContent += `face_dir_LR: ${data[0]} face_dir_UD: ${data[1]} gazeLR: ${data[2]} gazeUD: ${data[3]}\n`; //$dataに送られてきたデータが入っている．messageに蓄積された内容が入っている
       remote_face_LR.push(data[0]);
@@ -168,9 +168,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         localStream.getAudioTracks().forEach((track) => (track.enabled = true));
         callJudge = 1;
         last_time = Date.now();
-      }
-      
-      if(now_time - last_time > 20000) {
+      }else if (now_time - last_time > 20000) {
         callJudge = 0;
       }
 
@@ -324,8 +322,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
             localStream.getAudioTracks().forEach((track) => (track.enabled = true));
             callJudge = 1;
             last_time = Date.now();
-          }
-          if(now_time - last_time > 10000) {
+          }else if(now_time - last_time > 10000) {
             callJudge = 0;
           }
 
