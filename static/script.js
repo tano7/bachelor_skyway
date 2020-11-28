@@ -168,7 +168,9 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         localStream.getAudioTracks().forEach((track) => (track.enabled = true));
         callJudge = 1;
         last_time = Date.now();
-      }else if (now_time - last_time > 20000) {
+      }
+      
+      if(now_time - last_time > 20000) {
         callJudge = 0;
       }
 
@@ -322,7 +324,8 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
             localStream.getAudioTracks().forEach((track) => (track.enabled = true));
             callJudge = 1;
             last_time = Date.now();
-          }else if(now_time - last_time > 10000) {
+          }
+          if(now_time - last_time > 10000) {
             callJudge = 0;
           }
 
