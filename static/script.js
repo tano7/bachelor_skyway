@@ -29,7 +29,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
   var now_time;
 
   //通話判定用 0 or 1
-  var callJudge = 0;
+  var callJudge;
   var voiceJudge;
   
   //htmlにある要素をjsで使用するために紐付ける
@@ -180,8 +180,8 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       }
 
       ws.send(data); //Pythonにリモートデータ送信
-      console.log(callJudge);
-          console.log(data);
+      //console.log(callJudge);
+      //    console.log(data);
     }
   });
 
@@ -221,6 +221,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
           finalTranscript += transcript;
           if(callJudge == 0) {
             dataConnection.send("v");
+            console.log('senddd');
           }
           last_time = Date.now();
           //recognition.stop();
@@ -334,8 +335,8 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
             data[4] = 'g';
           }
           ws.send(data); //pythonにリモートデータ送信
-          console.log(callJudge);
-          console.log(data);
+          //console.log(callJudge);
+          //console.log(data);
         }
       });
 
@@ -375,6 +376,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
             finalTranscript += transcript;
             if(callJudge == 0) {
               dataConnection.send("v");
+              console.log('senddd');
             }
             last_time = Date.now();
             //recogtnition.stop();
