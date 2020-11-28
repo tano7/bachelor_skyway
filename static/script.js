@@ -30,6 +30,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 
   //通話判定用 0 or 1
   var callJudge = 0;
+  var voiceJudge;
   
   //htmlにある要素をjsで使用するために紐付ける
   const localVideo = document.getElementById('js-local-stream');
@@ -126,6 +127,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     dataConnection.once('open', async () => {
       messages.textContent += `=== DataConnection has been opened ===\n`;
       recognition.start();
+      voiceJudge = 1;
       message='dummy';
       ws.send(message);
     });
@@ -217,12 +219,19 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
             dataConnection.send("v");
           }
           last_time = Date.now();
+          //recognition.stop();
         } else {
           interimTranscript = transcript;
         }
       }
       resultDiv.innerHTML = finalTranscript + '<i style="color:#ddd;">' + interimTranscript + '</i>';
     }
+    recognition.onend = function(){
+      console.log('Recognition Finished.');
+      recognition.start();
+
+    }
+
   });
 
   //こっから呼び出される方---------------------------------------------------------
@@ -271,6 +280,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       dataConnection.once('open', async () => {
         messages.textContent += `=== DataConnection has been opened ===\n`;
         recognition.start();
+        voiceJudge = 1;
         message='dummy';
         ws.send(message);
       });
@@ -359,6 +369,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
               dataConnection.send("v");
             }
             last_time = Date.now();
+            //recogtnition.stop();
           } else {
             interimTranscript = transcript;
           }
@@ -367,6 +378,11 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       }
 
     });
+
+    recognition.onend = function(){
+      console.log('Recognition Finished.');
+      recognition.start();
+    }
 
     peer.on('error', console.error);
   });
