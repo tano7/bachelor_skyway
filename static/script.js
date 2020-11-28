@@ -182,7 +182,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       }
 
       ws.send(data); //Pythonにリモートデータ送信
-      console.log(last_time);
+      console.log(now_time - last_time);
       //console.log(callJudge);
       //    console.log(data);
     }
@@ -340,7 +340,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
             data[4] = 'g';
           }
           ws.send(data); //pythonにリモートデータ送信
-          console.log(last_time);
+          console.log(now_time - last_time);
           //console.log(data);
         }
       });
