@@ -31,6 +31,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
   //通話判定用 0 or 1
   var callJudge;
   var voiceJudge;
+  var remote_callJudge;
   
   //htmlにある要素をjsで使用するために紐付ける
   const localVideo = document.getElementById('js-local-stream');
@@ -154,6 +155,8 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 
       now_time = Date.now();
 
+      remote_callJudge = data[4];
+
       //相互注視判定
       var i = 1;
       while(i < 3) {
@@ -168,7 +171,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         localStream.getAudioTracks().forEach((track) => (track.enabled = true));
         callJudge = 1;
         last_time = Date.now();
-      }else if (now_time - last_time > 20000) {
+      }else if (now_time - last_time > 10000) {
         callJudge = 0;
       }
 
@@ -219,7 +222,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         let transcript = event.results[i][0].transcript; //event.result[i][0].transcriptに結果が入っている.
         if (event.results[i].isFinal) { //isFinalで終了したかどうかを判定
           finalTranscript += transcript;
-          if(callJudge == 0) {
+          if(callJudge == 0 && remote_callJudge == 0) {
             dataConnection.send("v");
             console.log('senddd');
           }
@@ -309,6 +312,8 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 
           now_time = Date.now();
 
+          remote_callJudge = data[4];
+
           //相互注視判定
           var i = 1;
           while(i < 3) {
@@ -374,7 +379,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
           let transcript = event.results[i][0].transcript;
           if (event.results[i].isFinal) { //isFinalで終了したかどうかを判定
             finalTranscript += transcript;
-            if(callJudge == 0) {
+            if(callJudge == 0 && remote_callJudge == 0) {
               dataConnection.send("v");
               console.log('senddd');
             }
