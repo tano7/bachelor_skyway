@@ -161,7 +161,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         }
       }
       if(i == 3) {
-        console.log('Mutual Gaze Detected.');
+        //console.log('Mutual Gaze Detected.');
         localStream.getAudioTracks().forEach((track) => (track.enabled = true));
         callJudge = 1;
         last_time = Date.now();
@@ -171,7 +171,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 
       if(callJudge == 0 && data[4] == 0) {
         localStream.getAudioTracks().forEach((track) => (track.enabled = false));
-        console.log('Fin Call');
+        //console.log('Fin Call');
         data[4] = 'e';
       }else {
         data[4] = 'g';
@@ -227,7 +227,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       resultDiv.innerHTML = finalTranscript + '<i style="color:#ddd;">' + interimTranscript + '</i>';
     }
     recognition.onend = function(){
-      console.log('Recognition Finished.');
+      //console.log('Recognition Finished.');
       recognition.start();
 
     }
@@ -312,7 +312,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
             }
           }
           if(i == 3) {
-            console.log('Mutual Gaze Detected.');
+            //console.log('Mutual Gaze Detected.');
             localStream.getAudioTracks().forEach((track) => (track.enabled = true));
             callJudge = 1;
             last_time = Date.now();
@@ -380,7 +380,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     });
 
     recognition.onend = function(){
-      console.log('Recognition Finished.');
+      //console.log('Recognition Finished.');
       recognition.start();
     }
 
