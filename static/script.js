@@ -171,7 +171,6 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 
       if(callJudge == 0 && data[4] == 0) {
         localStream.getAudioTracks().forEach((track) => (track.enabled = false));
-        //console.log('Fin Call');
         data[4] = 'e';
       }else {
         data[4] = 'g';
@@ -322,7 +321,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 
           if(callJudge == 0 && data[4] == 0) {
             localStream.getAudioTracks().forEach((track) => (track.enabled = false));
-            console.log('Fin Call');
+            //console.log('Fin Call');
             data[4] = 'e';
           }else {
             data[4] = 'g';
