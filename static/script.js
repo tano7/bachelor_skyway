@@ -7,7 +7,7 @@ let recognition = new SpeechRecognition();
 recognition.lang = 'ja-JP';
 recognition.interimResults = false; //これをtrueにすると発言が終わったタイミングではなく認識している途中で暫定の認識結果を得ることができる
 //(上のやつfalseにすれば一言だけ認識できる？)
-recognition.continuous = true; //これをtrueにすると発言が終わったタイミングで録音が自動的に終了せず，続けて認識する（１分くらい沈黙が続くと終了する）
+recognition.continuous = false; //これをtrueにすると発言が終わったタイミングで録音が自動的に終了せず，続けて認識する（１分くらい沈黙が続くと終了する）
 //これの場合，認識された語はevent.results.[0][0].transcriptの次は[1][0]に入る
 let finalTranscript = ''; // 確定した(黒の)認識結果
 
