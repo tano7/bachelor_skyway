@@ -181,6 +181,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         data[4] = 'g';
       }
 
+      console.log(now_time - last_time);
       ws.send(data); //Pythonにリモートデータ送信
       //console.log(callJudge);
       //    console.log(data);
