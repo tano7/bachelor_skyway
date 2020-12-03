@@ -149,7 +149,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         }
       }
       if(i == 3) {
-        messages.textContent += `Matual gaze detected. Call has been unmuted.\n`;
+        messages.textContent += `Matual gaze detected.\n`;
         localStream.getAudioTracks().forEach((track) => (track.enabled = true));
         local_callJudge = 1;
         last_time = Date.now();
