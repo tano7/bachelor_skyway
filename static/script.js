@@ -159,7 +159,6 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 
       if(local_callJudge == 0 && remote_callJudge == 0) {
         localStream.getAudioTracks().forEach((track) => (track.enabled = false));
-        messages.textContent += `Call has been muted.\n`;
         data[4] = 'e'; //通話接続ない状態
       }else {
         data[4] = 'g'; //通話接続状態
@@ -212,7 +211,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
           interimTranscript = transcript;
         }
       }
-      resultDiv.innerHTML = finalTranscript + '<i style="color:#ddd;">' + interimTranscript + '</i>';
+      //resultDiv.innerHTML = finalTranscript + '<i style="color:#ddd;">' + interimTranscript + '</i>';
     }
     recognition.onend = function(){
       recognition.start();
@@ -298,7 +297,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
           }
           if(i == 3) {
             localStream.getAudioTracks().forEach((track) => (track.enabled = true));
-            messages.textContent += `Matual gaze detected. Call has been unmuted.\n`;
+            messages.textContent += `Matual gaze detected.\n`;
             local_callJudge = 1;
             last_time = Date.now();
           }else if(now_time - last_time > 20000) {
@@ -307,7 +306,6 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 
           if(local_callJudge == 0 && remote_callJudge == 0) {
             localStream.getAudioTracks().forEach((track) => (track.enabled = false));
-            messages.textContent += `Call has been muted.\n`;
             data[4] = 'e';
           }else {
             data[4] = 'g';
@@ -360,7 +358,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
             interimTranscript = transcript;
           }
         }
-        resultDiv.innerHTML = finalTranscript + '<i style="color:#ddd;">' + interimTranscript + '</i>';
+        //resultDiv.innerHTML = finalTranscript + '<i style="color:#ddd;">' + interimTranscript + '</i>';
       }
       recognition.onend = function(){
         recognition.start();
