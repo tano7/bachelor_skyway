@@ -127,7 +127,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     //初めて繋がった時にメッセージ送る
     dataConnection.once('open', async () => {
       messages.textContent += `=== DataConnection has been opened ===\n`;
-      //recognition.start(); 20201202
+      recognition.start();
       voiceJudge = 1;
       message='dummy';
       ws.send(message);
@@ -234,10 +234,10 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       }
       resultDiv.innerHTML = finalTranscript + '<i style="color:#ddd;">' + interimTranscript + '</i>';
     }
-    // recognition.onend = function(){
-    //   recognition.start();
-    //   console.log('Recognition Restart.');
-    // }
+    recognition.onend = function(){
+      recognition.start();
+      console.log('Recognition Restart.');
+    }
 
   });
 
@@ -287,7 +287,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     peer.on('connection', dataConnection => {
       dataConnection.once('open', async () => {
         messages.textContent += `=== DataConnection has been opened ===\n`;
-        //recognition.start();
+        recognition.start();
         voiceJudge = 1;
         message='dummy';
         ws.send(message);
@@ -393,10 +393,10 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 
     });
 
-    // recognition.onend = function(){
-    //   //console.log('Recognition Finished.');
-    //   recognition.start();
-    // }
+    recognition.onend = function(){
+      //console.log('Recognition Finished.');
+      recognition.start();
+    }
 
     peer.on('error', console.error);
   });
