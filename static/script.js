@@ -335,7 +335,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         }
         local_face_LR.push(face_value[0]);
         local_face_UD.push(face_value[1]);
-        face_value.push(callJudge);
+        face_value.push(local_callJudge);
       
         //視線情報をhtmlで表示するために#rcv要素にstring型で値を追加していく
         // var string_txt = "face_dir_LR: " + face_value[0] + " face_dir_UD: " + face_value[1] + " gaze_LR: " + face_value[2] + " gaze_UD: " + face_value[3] + "<br>"
@@ -362,11 +362,10 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         }
         resultDiv.innerHTML = finalTranscript + '<i style="color:#ddd;">' + interimTranscript + '</i>';
       }
+      recognition.onend = function(){
+        recognition.start();
+      }
     });
-
-    recognition.onend = function(){
-      recognition.start();
-    }
 
     peer.on('error', console.error);
   });
