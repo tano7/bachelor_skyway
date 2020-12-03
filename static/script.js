@@ -362,11 +362,11 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         }
         resultDiv.innerHTML = finalTranscript + '<i style="color:#ddd;">' + interimTranscript + '</i>';
       }
-
-      recognition.onend = function(){
-        recognition.start();
-      }
     });
+
+    recognition.onend = function(){
+      recognition.start();
+    }
 
     peer.on('error', console.error);
   });
