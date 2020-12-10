@@ -207,6 +207,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
             messages.textContent += `voice sent.\n`;
           }
           last_time = Date.now();
+          console.log('voice recognition');
         } else {
           interimTranscript = transcript;
         }
@@ -354,6 +355,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
             }
             last_time = Date.now();
             //recogtnition.stop();
+            console.log('voice recognition');
           } else {
             interimTranscript = transcript;
           }
