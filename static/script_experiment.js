@@ -28,8 +28,8 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
   var now_time;
 
   //通話判定用 0 or 1
-  var local_callJudge;
-  var remote_callJudge;
+  var local_callJudge = 0;
+  var remote_callJudge = 0;
   
   //htmlにある要素をjsで使用するために紐付ける
   const localVideo = document.getElementById('js-local-stream');
@@ -161,11 +161,13 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     });
 
     ws.onmessage = async function(x){
+      var face_value = JSON.parse(x.data);
 
       //視線情報をhtmlで表示するために#rcv要素にstring型で値を追加していく
       // var string_txt = "face_dir_LR: " + face_value[0] + " face_dir_UD: " + face_value[1] + " gaze_LR: " + face_value[2] + " gaze_UD: " + face_value[3] + "<br>"
       // $("#rcv").append(string_txt)
       await dataConnection.send(local_callJudge);
+      console.log()
     }
 
     //音声認識を受け取る
@@ -280,11 +282,13 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       });
 
       ws.onmessage = async function(x){
+        var face_value = JSON.parse(x.data);
       
         //視線情報をhtmlで表示するために#rcv要素にstring型で値を追加していく
         // var string_txt = "face_dir_LR: " + face_value[0] + " face_dir_UD: " + face_value[1] + " gaze_LR: " + face_value[2] + " gaze_UD: " + face_value[3] + "<br>"
         // $("#rcv").append(string_txt)  
         await dataConnection.send(local_callJudge);
+        console.log(local_callJudge;)
       }
 
       //音声認識を受け取る
