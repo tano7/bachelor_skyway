@@ -288,7 +288,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         // var string_txt = "face_dir_LR: " + face_value[0] + " face_dir_UD: " + face_value[1] + " gaze_LR: " + face_value[2] + " gaze_UD: " + face_value[3] + "<br>"
         // $("#rcv").append(string_txt)  
         await dataConnection.send(local_callJudge);
-        console.log(local_callJudge;)
+        console.log(local_callJudge);
       }
 
       //音声認識を受け取る
