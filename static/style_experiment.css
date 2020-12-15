@@ -77,6 +77,8 @@ video {
 }
 
 .btn-square {
+  width: 100px;
+  height: 100px;
   display: inline-block;
   padding: 0.5em 1em;
   text-decoration: none;
