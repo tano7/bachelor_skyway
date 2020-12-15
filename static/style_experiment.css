@@ -76,9 +76,16 @@ video {
   margin-top: 0;
 }
 
+.parent {
+  text-align: center;
+  width: 1000px;
+  height: 1000px;
+}
+
 .btn-square {
-  width: 100px;
+  width: 600px;
   height: 100px;
+  font-size: 30px;
   display: inline-block;
   padding: 0.5em 1em;
   text-decoration: none;
@@ -86,6 +93,9 @@ video {
   color: #FFF;
   border-bottom: solid 4px #627295;
   border-radius: 3px;
+  position: relative;
+  top: 400px;
+
 }
 .btn-square:active {
   /*ボタンを押したとき*/
