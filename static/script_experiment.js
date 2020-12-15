@@ -132,19 +132,44 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 
       remote_callJudge = data; //相手の通話状態をdata[4]に格納（0 or 1），注視有無 && 20秒間通話有無
 
-      if(local_callJudge == 1 && remote_callJudge == 1) {
+      if(local_callJudge == 0 && remote_callJudge == 0) {
+        localStream.getAudioTracks().forEach((track) => (track.enabled = false));
+        data = 'r'; 
+      }else if(local_callJudge == 1 && remote_callJudge == 0){
+        localStream.getAudioTracks().forEach((track) => (track.enabled = false));
+        data = 'r'; 
+      }else if(local_callJudge == 0 && remote_callJudge == 1){
+        localStream.getAudioTracks().forEach((track) => (track.enabled = false));
+        data = 'y'; 
+      }else if(local_callJudge == 2 && remote_callJudge == 2){
+        localStream.getAudioTracks().forEach((track) => (track.enabled = false));
+        data = 'r'; 
+        local_callJudge = 0;
+      }else {
         localStream.getAudioTracks().forEach((track) => (track.enabled = true));
         data = 'g'; 
         if(Date.now() - last_time > 10000) {
-          
+          local_callJudge = 2;
+        }else {
+          local_callJudge = 1;
         }
-      }else if(remote_callJudge == 1 && local_callJudge == 0){
-        localStream.getAudioTracks().forEach((track) => (track.enabled = false));
-        data = 'y'; 
-      }else {
-        localStream.getAudioTracks().forEach((track) => (track.enabled = false));
-        data = 'r'; 
       }
+
+      // if(local_callJudge == 1 && remote_callJudge == 1) {
+      //   localStream.getAudioTracks().forEach((track) => (track.enabled = true));
+      //   data = 'g'; 
+      //   if(Date.now() - last_time > 10000) {
+      //     local_callJudge = 2;
+      //   }else {
+      //     local_callJudge = 1;
+      //   }
+      // }else if(remote_callJudge == 1 && local_callJudge == 0){
+      //   localStream.getAudioTracks().forEach((track) => (track.enabled = false));
+      //   data = 'y'; 
+      // }else {
+      //   localStream.getAudioTracks().forEach((track) => (track.enabled = false));
+      //   data = 'r'; 
+      // }
 
       ws.send(data); //Pythonにリモートデータ送信
   });
@@ -253,18 +278,30 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       dataConnection.on('data', data => {
         remote_callJudge = data; //相手の通話状態をdata[4]に格納（0 or 1），注視有無 && 20秒間通話有無
 
-      if(local_callJudge == 1 && remote_callJudge == 1) {
-        localStream.getAudioTracks().forEach((track) => (track.enabled = true));
-        data = 'g'; //通話接続ない状態
-      }else if(remote_callJudge == 1 && local_callJudge == 0){
-        localStream.getAudioTracks().forEach((track) => (track.enabled = false));
-        data = 'y'; //通話接続状態
-      }else {
-        localStream.getAudioTracks().forEach((track) => (track.enabled = false));
-        data = 'r'; //通話接続状態
-      }
+        if(local_callJudge == 0 && remote_callJudge == 0) {
+          localStream.getAudioTracks().forEach((track) => (track.enabled = false));
+          data = 'r'; 
+        }else if(local_callJudge == 1 && remote_callJudge == 0){
+          localStream.getAudioTracks().forEach((track) => (track.enabled = false));
+          data = 'r'; 
+        }else if(local_callJudge == 0 && remote_callJudge == 1){
+          localStream.getAudioTracks().forEach((track) => (track.enabled = false));
+          data = 'y'; 
+        }else if(local_callJudge == 2 && remote_callJudge == 2){
+          localStream.getAudioTracks().forEach((track) => (track.enabled = false));
+          data = 'r'; 
+          local_callJudge = 0;
+        }else {
+          localStream.getAudioTracks().forEach((track) => (track.enabled = true));
+          data = 'g'; 
+          if(Date.now() - last_time > 10000) {
+            local_callJudge = 2;
+          }else {
+            local_callJudge = 1;
+          }
+        }
 
-      ws.send(data); //Pythonにリモートデータ送信
+        ws.send(data); //Pythonにリモートデータ送信
       });
 
       //接続を終了する時の処理
