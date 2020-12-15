@@ -98,6 +98,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     callRequest.addEventListener('click', () => {
       local_callJudge = 1;
       last_time = Date.now();
+      console.log('Call request');
     });
 
     callCancel.addEventListener('click', () => {
@@ -231,6 +232,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       callRequest.addEventListener('click', () => {
         local_callJudge = 1;
         last_time = Date.now();
+        console.log('Call request');
       });
   
       callCancel.addEventListener('click', () => {
