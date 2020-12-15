@@ -42,6 +42,10 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
   const callRequest = document.getElementById('call-request');
   const callCancel = document.getElementById('call-cancel');
 
+  callRequest.addEventListener('click', () => {
+    console.log('Call request');
+  });
+
   //とりあえず共通で書いておくやつ
   meta.innerText = `
     UA: ${navigator.userAgent}
