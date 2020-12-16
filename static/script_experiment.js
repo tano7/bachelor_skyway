@@ -35,7 +35,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
   const meta = document.getElementById('js-meta');
   const sdkSrc = document.querySelector('script[src*=skyway]');
   const connectTrigger = document.getElementById('js-connect-trigger');
-  const messages = document.getElementById('js-messages');
+  // const messages = document.getElementById('js-messages');
   const stopCall = document.getElementById('stop-call'); //通話接続しながらミュート
   const resultDiv = document.querySelector('#result-div'); //音声認識
   const createPeer = document.getElementById('create-peer'); //PeerID生成
@@ -75,7 +75,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     const mediaConnection = peer.call(remoteId.value, localStream);
     //接続先Peerへのメディアチャンネル接続を管理するクラス
     mediaConnection.on('stream', async stream => {
-      messages.textContent += `=== Call has been connected ===\n`;
+      // messages.textContent += `=== Call has been connected ===\n`;
       //リモートの相手をstreamして表示
       remoteVideo.srcObject = stream;
       remoteVideo.playsInline = true;
@@ -85,7 +85,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     mediaConnection.once('close', () => {
       remoteVideo.srcObject.getTracks().forEach(track => track.stop());
       remoteVideo.srcObject = null;
-      messages.textContent += `=== Call has been disconnected ===\n`;
+      // messages.textContent += `=== Call has been disconnected ===\n`;
     });
     //電話を終わるトリガー
     closeTrigger.addEventListener('click', () => mediaConnection.close(true));
@@ -121,7 +121,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 
     //初めて繋がった時にメッセージ送る
     dataConnection.once('open', async () => {
-      messages.textContent += `=== DataConnection has been opened ===\n`;
+      // messages.textContent += `=== DataConnection has been opened ===\n`;
       recognition.start();
       message='dummy';
       ws.send(message);
@@ -176,7 +176,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 
     //接続を終了する時の処理
     dataConnection.once('close', () => {
-      messages.textContent += `=== DataConnection has been closed ===\n`;
+      // messages.textContent += `=== DataConnection has been closed ===\n`;
     });
 
     //チャット終わるトリガー
@@ -193,7 +193,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       await dataConnection.send(local_callJudge);
     }
 
-    音声認識を受け取る
+    //音声認識を受け取る
     recognition.onresult = (event) => {
       let interimTranscript = ''; // 暫定(灰色)の認識結果
       for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -232,7 +232,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     peer.on('call', mediaConnection => {
       mediaConnection.answer(localStream); //localStreamで応答する
       mediaConnection.on('stream', async stream => {
-        messages.textContent += `=== Call has been connected ===\n`;
+        // messages.textContent += `=== Call has been connected ===\n`;
         localStream.getAudioTracks().forEach((track) => (track.enabled = false));
         local_callJudge = 0;
         //リモートの相手を呼び出し先として表示
@@ -244,7 +244,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       mediaConnection.once('close', () => {
         remoteVideo.srcObject.getTracks().forEach(track => track.stop());
         remoteVideo.srcObject = null;
-        messages.textContent += `=== Call has been disconnected ===\n`;
+        // messages.textContent += `=== Call has been disconnected ===\n`;
       });
       //電話を終わるトリガー
       closeTrigger.addEventListener('click', () => mediaConnection.close(true));
@@ -269,7 +269,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     //チャットを接続する
     peer.on('connection', dataConnection => {
       dataConnection.once('open', async () => {
-        messages.textContent += `=== DataConnection has been opened ===\n`;
+        // messages.textContent += `=== DataConnection has been opened ===\n`;
         recognition.start();
         message='dummy';
         ws.send(message);
@@ -306,7 +306,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 
       //接続を終了する時の処理
       dataConnection.once('close', () => {
-        messages.textContent += `=== DataConnection has been closed ===\n`;
+        // messages.textContent += `=== DataConnection has been closed ===\n`;
       });
 
       ////チャット終わるトリガー
@@ -322,7 +322,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         await dataConnection.send(local_callJudge);
       }
 
-      音声認識を受け取る
+      //音声認識を受け取る
       recognition.onresult = (event) => {
         let interimTranscript = ''; // 暫定(灰色)の認識結果
         for (let i = event.resultIndex; i < event.results.length; i++) {
