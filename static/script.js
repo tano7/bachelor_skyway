@@ -141,7 +141,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 
       //相互注視判定
       var i = 1;
-      while(i < 3) { //ここと下のif (i==)の部分の数字によって長さ設定．今のところi = 1につき約0.14s
+      while(i < 2) { //ここと下のif (i==)の部分の数字によって長さ設定．今のところi = 1につき約0.14s
         if(remote_face_LR[remote_face_LR.length - i] < 10 && remote_face_LR[remote_face_LR.length - i] > -10 && local_face_LR[local_face_LR.length - i] < 10 && local_face_LR[local_face_LR.length - i] > -10) {
           i++;
         }else {
@@ -289,14 +289,14 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 
           //相互注視判定
           var i = 1;
-          while(i < 3) {
+          while(i < 2) {
             if(remote_face_LR[remote_face_LR.length - i] < 10 && remote_face_LR[remote_face_LR.length - i] > -10 && local_face_LR[local_face_LR.length - i] < 10 && local_face_LR[local_face_LR.length - i] > -10) {
               i++;
             }else {
               break;
             }
           }
-          if(i == 3) {
+          if(i == 2) {
             localStream.getAudioTracks().forEach((track) => (track.enabled = true));
             // messages.textContent += `Matual gaze detected.\n`;
             local_callJudge = 1;
