@@ -41,7 +41,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
   const meta = document.getElementById('js-meta');
   const sdkSrc = document.querySelector('script[src*=skyway]');
   const connectTrigger = document.getElementById('js-connect-trigger');
-  const messages = document.getElementById('js-messages');
+  // const messages = document.getElementById('js-messages');
   const stopCall = document.getElementById('stop-call'); //通話接続しながらミュート
   const resultDiv = document.querySelector('#result-div'); //音声認識
   const createPeer = document.getElementById('create-peer'); //PeerID生成
@@ -79,7 +79,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     const mediaConnection = peer.call(remoteId.value, localStream);
     //接続先Peerへのメディアチャンネル接続を管理するクラス
     mediaConnection.on('stream', async stream => {
-      messages.textContent += `=== Call has been connected ===\n`;
+      // messages.textContent += `=== Call has been connected ===\n`;
       //リモートの相手をstreamして表示
       remoteVideo.srcObject = stream;
       remoteVideo.playsInline = true;
@@ -89,7 +89,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     mediaConnection.once('close', () => {
       remoteVideo.srcObject.getTracks().forEach(track => track.stop());
       remoteVideo.srcObject = null;
-      messages.textContent += `=== Call has been disconnected ===\n`;
+      // messages.textContent += `=== Call has been disconnected ===\n`;
     });
     //電話を終わるトリガー
     closeTrigger.addEventListener('click', () => mediaConnection.close(true));
@@ -115,7 +115,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 
     //初めて繋がった時にメッセージ送る
     dataConnection.once('open', async () => {
-      messages.textContent += `=== DataConnection has been opened ===\n`;
+      // messages.textContent += `=== DataConnection has been opened ===\n`;
       recognition.start();
       message='dummy';
       ws.send(message);
@@ -126,7 +126,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     dataConnection.on('data', data => { //on.'data'でデータが送られた時に自動的に発火する
     if(data[0] == 'v') { //音声が送られた場合vを受け取る
       speechdata = [remote_face_LR[remote_face_LR.length - 1], remote_face_UD[remote_face_UD.length - 1], 0, 0, 'v'];
-      messages.textContent += `voice recieved.\n`;
+      // messages.textContent += `voice recieved.\n`;
       ws.send(speechdata);
     }else {
       remote_face_LR.push(data[0]);
@@ -149,7 +149,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         }
       }
       if(i == 3) {
-        messages.textContent += `Matual gaze detected.\n`;
+        // messages.textContent += `Matual gaze detected.\n`;
         localStream.getAudioTracks().forEach((track) => (track.enabled = true));
         local_callJudge = 1;
         last_time = Date.now();
@@ -170,7 +170,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 
     //接続を終了する時の処理
     dataConnection.once('close', () => {
-      messages.textContent += `=== DataConnection has been closed ===\n`;
+      // messages.textContent += `=== DataConnection has been closed ===\n`;
     });
 
     //チャット終わるトリガー
@@ -204,7 +204,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
           finalTranscript += transcript;
           if(local_callJudge == 0 && remote_callJudge == 0) { //音声通話が接続していない状態のみ呼びかけを送信する
             dataConnection.send("v");
-            messages.textContent += `voice sent.\n`;
+            // messages.textContent += `voice sent.\n`;
           }
           last_time = Date.now();
           console.log('voice recognition');
@@ -238,7 +238,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     peer.on('call', mediaConnection => {
       mediaConnection.answer(localStream); //localStreamで応答する
       mediaConnection.on('stream', async stream => {
-        messages.textContent += `=== Call has been connected ===\n`;
+        // messages.textContent += `=== Call has been connected ===\n`;
         localStream.getAudioTracks().forEach((track) => (track.enabled = false));
         local_callJudge = 0;
         //リモートの相手を呼び出し先として表示
@@ -250,7 +250,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       mediaConnection.once('close', () => {
         remoteVideo.srcObject.getTracks().forEach(track => track.stop());
         remoteVideo.srcObject = null;
-        messages.textContent += `=== Call has been disconnected ===\n`;
+        // messages.textContent += `=== Call has been disconnected ===\n`;
       });
       //電話を終わるトリガー
       closeTrigger.addEventListener('click', () => mediaConnection.close(true));
@@ -265,7 +265,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     //チャットを接続する
     peer.on('connection', dataConnection => {
       dataConnection.once('open', async () => {
-        messages.textContent += `=== DataConnection has been opened ===\n`;
+        // messages.textContent += `=== DataConnection has been opened ===\n`;
         recognition.start();
         message='dummy';
         ws.send(message);
@@ -274,7 +274,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       dataConnection.on('data', data => {
         if(data[0] == 'v') {
           speechdata = [remote_face_LR[remote_face_LR.length - 1], remote_face_UD[remote_face_UD.length - 1], 0, 0, 'v'];
-          messages.textContent += `voice recieved.\n`;
+          // messages.textContent += `voice recieved.\n`;
           ws.send(speechdata);
         }else {
           remote_face_LR.push(data[0]);
@@ -298,7 +298,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
           }
           if(i == 3) {
             localStream.getAudioTracks().forEach((track) => (track.enabled = true));
-            messages.textContent += `Matual gaze detected.\n`;
+            // messages.textContent += `Matual gaze detected.\n`;
             local_callJudge = 1;
             last_time = Date.now();
           }else if(now_time - last_time > 6000) {
@@ -317,7 +317,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 
       //接続を終了する時の処理
       dataConnection.once('close', () => {
-        messages.textContent += `=== DataConnection has been closed ===\n`;
+        // messages.textContent += `=== DataConnection has been closed ===\n`;
       });
 
       ////チャット終わるトリガー
@@ -351,7 +351,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
             finalTranscript += transcript;
             if(local_callJudge == 0 && remote_callJudge == 0) {
               dataConnection.send("v");
-              messages.textContent += `voice sent.\n`;
+              // messages.textContent += `voice sent.\n`;
             }
             last_time = Date.now();
             //recogtnition.stop();
