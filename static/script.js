@@ -157,7 +157,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         localStream.getAudioTracks().forEach((track) => (track.enabled = true));
         local_callJudge = 1;
         last_time = Date.now();
-      }else if (now_time - last_time > 8000) {
+      }else if (now_time - last_time > 10000) {
         local_callJudge = 0;
       }
 
@@ -309,7 +309,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
             // messages.textContent += `Matual gaze detected.\n`;
             local_callJudge = 1;
             last_time = Date.now();
-          }else if(now_time - last_time > 8000) {
+          }else if(now_time - last_time > 10000) {
             local_callJudge = 0;
           }
 
