@@ -139,6 +139,10 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       remote_callJudge = data[4]; //相手の通話状態をdata[4]に格納（0 or 1），注視有無 && 20秒間通話有無
       now_time = Date.now();
 
+      if(local_face_LR[local_face_LR.length - i] < 10 && local_face_LR[local_face_LR.length - i] > -10) {
+        last_time = Date.now();
+      }
+
       //相互注視判定
       var i = 1;
       while(i < 2) { //ここと下のif (i==)の部分の数字によって長さ設定．今のところi = 1につき約0.14s
@@ -286,6 +290,10 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 
           remote_callJudge = data[4];
           now_time = Date.now();
+
+          if(local_face_LR[local_face_LR.length - i] < 10 && local_face_LR[local_face_LR.length - i] > -10) {
+            last_time = Date.now();
+          }
 
           //相互注視判定
           var i = 1;
