@@ -46,6 +46,21 @@
       </div>
       <p class="meta" id="js-meta"></p>
     </div>
+
+    <!-- 通信確認用 -->
+    <form>
+      <!-- サーバーにメッセージを送信するテキストボックス -->
+      <input id="textMessage" type="text">
+      <!-- 送信ボタン -->
+      <input onclick="sendMessage()" value="Send" type="button">
+      <!-- 接続終了ボタン -->
+      <input onclick="disconnect()" value="Disconnect" type="button">
+    </form>
+    <br />
+    <!-- 出力 area -->
+    <textarea id="messageTextArea" rows="10" cols="50"></textarea>
+
+
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
     <script src="//code.jquery.com/jquery-1.8.2.min.js"></script>
     <script src="https://cdn.webrtc.ecl.ntt.com/skyway-latest.js"></script>

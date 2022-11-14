@@ -14,8 +14,37 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 (async function main() {
 
   //WebSocket部分
-  var host = "ws://localhost:8080/pipe";
+  var host = "ws://localhost:9998";
   var ws = new WebSocket(host); //接続するサーバを指定
+
+    // ウェブサーバから受信したデータを出力するオブジェクトを取得する。
+    var messageTextArea = document.getElementById("messageTextArea");
+    // ソケット接続すれば呼び出す関数。
+    ws.onopen = function(message){
+      messageTextArea.value += "Server connect...\n";
+    };
+    // ソケット接続が切ると呼び出す関数。
+    ws.onclose = function(message){
+      messageTextArea.value += "Server Disconnect...\n";
+    };
+    // ソケット通信中でエラーが発生すれば呼び出す関数。
+    ws.onerror = function(message){
+      messageTextArea.value += "error...\n";
+    };
+    // ソケットサーバからメッセージが受信すれば呼び出す関数。
+    ws.onmessage = function(message){
+      // 出力areaにメッセージを表示する。
+      messageTextArea.value += "Recieve From Server => "+message.data+"\n";
+    };
+    // サーバにメッセージを送信する関数。
+    function sendMessage(){
+      var message = document.getElementById("textMessage");
+      messageTextArea.value += "Send to Server => "+message.value+"\n";
+      // WebSocketでtextMessageのオブジェクトの値を送信する。
+      ws.send(message.value);
+      //textMessageオブジェクトの初期化
+      message.value = "";
+    }
 
   //相互注視検出用配列
   var local_face_LR = [0];
