@@ -35,6 +35,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     ws.onmessage = function(message){
       // 出力areaにメッセージを表示する。
       messageTextArea.value += "Recieve From Server => "+message.data+"\n";
+      console.log("left_shoulder.x: " + message.data)
     };
     // サーバにメッセージを送信する関数。
     function sendMessage(){
