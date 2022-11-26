@@ -14,39 +14,16 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 (async function main() {
 
   //WebSocket部分
-  var host = "ws://localhost:9999";
+  var host = "ws://localhost:9998";
   var ws = new WebSocket(host); //接続するサーバを指定
 
-    // ウェブサーバから受信したデータを出力するオブジェクトを取得する。
-    var messageTextArea = document.getElementById("messageTextArea");
-    // ソケット接続すれば呼び出す関数。
-    ws.onopen = function(message){
-      messageTextArea.value += "Server connect...\n";
-    };
-    // ソケット接続が切ると呼び出す関数。
-    ws.onclose = function(message){
-      messageTextArea.value += "Server Disconnect...\n";
-    };
-    // ソケット通信中でエラーが発生すれば呼び出す関数。
-    ws.onerror = function(message){
-      messageTextArea.value += "error...\n";
-    };
-    // ソケットサーバからメッセージが受信すれば呼び出す関数。
-    // ws.onmessage = function(message){
-    //   // 出力areaにメッセージを表示する。
-    //   messageTextArea.value += "Recieve From Server => "+message.data+"\n";
-    //   console.log(message.data);
-    //   dataConnection.send(message);
-    // };
-    // サーバにメッセージを送信する関数。
-    function sendMessage(){
-      var message = document.getElementById("textMessage");
-      messageTextArea.value += "Send to Server => "+message.value+"\n";
-      // WebSocketでtextMessageのオブジェクトの値を送信する。
-      ws.send(message.value);
-      //textMessageオブジェクトの初期化
-      message.value = "";
-    }
+  // 集中度・音声通話判定用変数
+  var local_posture = [0];
+  var local_face_LR = [0];
+  var local_face_UD = [0];
+  var remote_posture = [0];
+  var remote_face_LR = [0];
+  var remote_face_UD = [0];
 
   //相互注視検出用配列
   var local_face_LR = [0];
@@ -147,7 +124,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     //初めて繋がった時にメッセージ送る
     dataConnection.once('open', async () => {
       // messages.textContent += `=== DataConnection has been opened ===\n`;
-      recognition.start();
+      // recognition.start(); 音声認識！！！！！
       message='dummy';
       // ws.send(message);
     });
@@ -155,8 +132,32 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 
     //送られたデータを表示する処理
     dataConnection.on('data', data => { //on.'data'でデータが送られた時に自動的に発火する
-      console.log("received");
-      console.log(data);
+      // console.log("received:" + data);
+
+      remote_posture.push(Number(data[1]));
+      remote_face_LR.push(Number(data[4]));
+      remote_face_UD.push(Number(data[7]));
+      if(remote_posture.length > 20) {
+        remote_posture.shift();
+        remote_face_LR.shift();
+        remote_face_UD.shift();
+      }
+
+      now_time = Date.now();
+
+      // 音声通話判定
+      if(local_face_LR[19] == 4 && remote_face_LR[19] == 4) {
+        localStream.getAudioTracks().forEach((track) => (track.enabled = true));
+        local_callJudge = 1;
+        last_time = Date.now();
+
+        console.log("local:" + local_face_LR[19])
+      }
+
+      // 音声通話切断判定
+      if(now_time - last_time > 5000) {
+        localStream.getAudioTracks().forEach((track) => (track.enabled = false));
+      }
     // if(data[0] == 'v') { //音声が送られた場合vを受け取る
     //   speechdata = [remote_face_LR[remote_face_LR.length - 1], remote_face_UD[remote_face_UD.length - 1], 0, 0, 'v'];
     //   // messages.textContent += `voice recieved.\n`;
@@ -219,27 +220,20 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     ws.onmessage = async function(message){
       // 出力areaにメッセージを表示する。
       messageTextArea.value += "Recieve From Server => "+message.data+"\n";
-      console.log("sended");
-      console.log(message.data);
-      await dataConnection.send("a");
+      local_posture.push(Number(message.data[1]));
+      local_face_LR.push(Number(message.data[4]));
+      local_face_UD.push(Number(message.data[7]));
+      if(local_posture.length > 20) {
+        local_posture.shift();
+        local_face_LR.shift();
+        local_face_UD.shift();
+      };
+
+      console.log(message.data[4]);
+      // console.log(local_posture);
+      await dataConnection.send(message.data);
+      // console.log("sended:" + message.data);
     };
-
-    // ws.onmessage = async function(x){
-    //   var face_value = JSON.parse(x.data); //x.dataで送信された値の中身とってくる
-
-    //   if(local_face_LR.length > 12) {
-    //     local_face_LR.shift();
-    //     local_face_UD.shift();
-    //   }
-    //   local_face_LR.push(face_value[0]);
-    //   local_face_UD.push(face_value[1]);
-    //   face_value.push(local_callJudge);
-
-    //   //視線情報をhtmlで表示するために#rcv要素にstring型で値を追加していく
-    //   // var string_txt = "face_dir_LR: " + face_value[0] + " face_dir_UD: " + face_value[1] + " gaze_LR: " + face_value[2] + " gaze_UD: " + face_value[3] + "<br>"
-    //   // $("#rcv").append(string_txt)
-    //   await dataConnection.send(face_value);
-    // }
 
     //音声認識を受け取る
     recognition.onresult = (event) => {
@@ -312,14 +306,40 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     peer.on('connection', dataConnection => {
       dataConnection.once('open', async () => {
         // messages.textContent += `=== DataConnection has been opened ===\n`;
-        recognition.start();
+        // recognition.start();
         message='dummy';
-        ws.send(message);
+        // ws.send(message);
       });
 
       dataConnection.on('data', data => {
-        console.log("sreceived");
-        console.log(data);
+        // console.log("received:" + data);
+
+        remote_posture.push(Number(data[1]));
+        remote_face_LR.push(Number(data[4]));
+        remote_face_UD.push(Number(data[7]));
+        if(remote_posture.length > 20) {
+          remote_posture.shift();
+          remote_face_LR.shift();
+          remote_face_UD.shift();
+        }
+
+        now_time = Date.now();
+
+
+        // 音声通話判定
+        if(local_face_LR[19] == 4 && remote_face_LR[19] == 4) {
+          localStream.getAudioTracks().forEach((track) => (track.enabled = true));
+          local_callJudge = 1;
+          last_time = Date.now();
+
+          console.log("local:" + local_face_LR[19])
+
+        }
+
+        if(now_time - last_time > 5000) {
+          localStream.getAudioTracks().forEach((track) => (track.enabled = false));
+        }
+
         // if(data[0] == 'v') {
         //   speechdata = [remote_face_LR[remote_face_LR.length - 1], remote_face_UD[remote_face_UD.length - 1], 0, 0, 'v'];
         //   // messages.textContent += `voice recieved.\n`;
@@ -377,29 +397,19 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         once: true,
       });
 
-      // ws.onmessage = async function(x){
-      //   var face_value = JSON.parse(x.data); //x.dataで送信された値の中身とってくる
-
-      //   if(local_face_LR.length > 12) {
-      //     local_face_LR.shift();
-      //     local_face_UD.shift();
-      //   }
-      //   local_face_LR.push(face_value[0]);
-      //   local_face_UD.push(face_value[1]);
-      //   face_value.push(local_callJudge);
-      
-      //   //視線情報をhtmlで表示するために#rcv要素にstring型で値を追加していく
-      //   // var string_txt = "face_dir_LR: " + face_value[0] + " face_dir_UD: " + face_value[1] + " gaze_LR: " + face_value[2] + " gaze_UD: " + face_value[3] + "<br>"
-      //   // $("#rcv").append(string_txt)  
-      //   await dataConnection.send(face_value);
-      // }
-
       ws.onmessage = async function(message){
         // 出力areaにメッセージを表示する。
-        messageTextArea.value += "Recieve From Server => "+message.data+"\n";
-        console.log("sended");
-        console.log(message.data);
-        await dataConnection.send("a");
+        // messageTextArea.value += "Recieve From Server => "+message.data+"\n";
+        local_posture.push(Number(message.data[1]));
+        local_face_LR.push(Number(message.data[4]));
+        local_face_UD.push(Number(message.data[7]));
+        if(local_posture.length > 20) {
+          local_posture.shift();
+          local_face_LR.shift();
+          local_face_UD.shift();
+        };
+        await dataConnection.send(message.data);
+        // console.log("sended:" + message.data);
       };
 
       //音声認識を受け取る

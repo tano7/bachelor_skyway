@@ -32,11 +32,12 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       messageTextArea.value += "error...\n";
     };
     // ソケットサーバからメッセージが受信すれば呼び出す関数。
-    ws.onmessage = function(message){
-      // 出力areaにメッセージを表示する。
-      messageTextArea.value += "Recieve From Server => "+message.data+"\n";
-      console.log("left_shoulder.x: " + message.data)
-    };
+    // ws.onmessage = function(message){
+    //   // 出力areaにメッセージを表示する。
+    //   messageTextArea.value += "Recieve From Server => "+message.data+"\n";
+    //   console.log(message.data);
+    //   dataConnection.send(message);
+    // };
     // サーバにメッセージを送信する関数。
     function sendMessage(){
       var message = document.getElementById("textMessage");
@@ -146,61 +147,64 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     //初めて繋がった時にメッセージ送る
     dataConnection.once('open', async () => {
       // messages.textContent += `=== DataConnection has been opened ===\n`;
-      recognition.start();
+      // recognition.start(); 音声認識！！！！！
       message='dummy';
-      ws.send(message);
+      // ws.send(message);
     });
 
 
     //送られたデータを表示する処理
     dataConnection.on('data', data => { //on.'data'でデータが送られた時に自動的に発火する
-    if(data[0] == 'v') { //音声が送られた場合vを受け取る
-      speechdata = [remote_face_LR[remote_face_LR.length - 1], remote_face_UD[remote_face_UD.length - 1], 0, 0, 'v'];
-      // messages.textContent += `voice recieved.\n`;
-      ws.send(speechdata);
-    }else {
-      remote_face_LR.push(data[0]);
-      remote_face_UD.push(data[1]);
-      if(remote_face_LR.length > 12) {
-        remote_face_LR.shift();
-        remote_face_UD.shift();
-      }
+      console.log("received");
+      console.log(data);
+    // if(data[0] == 'v') { //音声が送られた場合vを受け取る
+    //   speechdata = [remote_face_LR[remote_face_LR.length - 1], remote_face_UD[remote_face_UD.length - 1], 0, 0, 'v'];
+    //   // messages.textContent += `voice recieved.\n`;
+    //   ws.send(speechdata);
+    // }else {
+    //   remote_face_LR.push(data[0]);
+    //   remote_face_UD.push(data[1]);
+    //   if(remote_face_LR.length > 12) {
+    //     remote_face_LR.shift();
+    //     remote_face_UD.shift();
+    //   }
 
-      remote_callJudge = data[4]; //相手の通話状態をdata[4]に格納（0 or 1），注視有無 && 20秒間通話有無
-      now_time = Date.now();
+    //   remote_callJudge = data[4]; //相手の通話状態をdata[4]に格納（0 or 1），注視有無 && 20秒間通話有無
+    //   now_time = Date.now();
 
-      if(local_face_LR[local_face_LR.length - i] < 10 && local_face_LR[local_face_LR.length - i] > -10) {
-        last_time = Date.now();
-      }
+    //   if(local_face_LR[local_face_LR.length - i] < 10 && local_face_LR[local_face_LR.length - i] > -10) {
+    //     last_time = Date.now();
+    //   }
 
-      //相互注視判定
-      var i = 1;
-      while(i < 2) { //ここと下のif (i==)の部分の数字によって長さ設定．今のところi = 1につき約0.14s
-        if(remote_face_LR[remote_face_LR.length - i] < 10 && remote_face_LR[remote_face_LR.length - i] > -10 && local_face_LR[local_face_LR.length - i] < 10 && local_face_LR[local_face_LR.length - i] > -10) {
-          i++;
-        }else {
-          break;
-        }
-      }
-      if(i == 2) {
-        // messages.textContent += `Matual gaze detected.\n`;
-        localStream.getAudioTracks().forEach((track) => (track.enabled = true));
-        local_callJudge = 1;
-        last_time = Date.now();
-      }else if (now_time - last_time > 10000) {
-        local_callJudge = 0;
-      }
+    //   //相互注視判定
+    //   var i = 1;
+    //   while(i < 2) { //ここと下のif (i==)の部分の数字によって長さ設定．今のところi = 1につき約0.14s
+    //     if(remote_face_LR[remote_face_LR.length - i] < 10 && remote_face_LR[remote_face_LR.length - i] > -10 && local_face_LR[local_face_LR.length - i] < 10 && local_face_LR[local_face_LR.length - i] > -10) {
+    //       i++;
+    //     }else {
+    //       break;
+    //     }
+    //   }
+    //   if(i == 2) {
+    //     // messages.textContent += `Matual gaze detected.\n`;
+    //     localStream.getAudioTracks().forEach((track) => (track.enabled = true));
+    //     local_callJudge = 1;
+    //     last_time = Date.now();
+    //   }else if (now_time - last_time > 10000) {
+    //     local_callJudge = 0;
+    //   }
 
-      if(local_callJudge == 0 && remote_callJudge == 0) {
-        localStream.getAudioTracks().forEach((track) => (track.enabled = false));
-        data[4] = 'e'; //通話接続ない状態
-      }else {
-        data[4] = 'g'; //通話接続状態
-      }
+    //   if(local_callJudge == 0 && remote_callJudge == 0) {
+    //     localStream.getAudioTracks().forEach((track) => (track.enabled = false));
+    //     data[4] = 'e'; //通話接続ない状態
+    //   }else {
+    //     data[4] = 'g'; //通話接続状態
+    //   }
 
-      ws.send(data); //Pythonにリモートデータ送信
-    }
-  });
+    //   ws.send(data); //Pythonにリモートデータ送信
+    // }
+  }
+  );
 
     //接続を終了する時の処理
     dataConnection.once('close', () => {
@@ -212,22 +216,29 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       once: true,
     });
 
-    ws.onmessage = async function(x){
-      var face_value = JSON.parse(x.data); //x.dataで送信された値の中身とってくる
+    ws.onmessage = async function(message){
+      // 出力areaにメッセージを表示する。
+      messageTextArea.value += "Recieve From Server => "+message.data+"\n";
+      console.log("sended");
+      console.log(message.data);
+    };
 
-      if(local_face_LR.length > 12) {
-        local_face_LR.shift();
-        local_face_UD.shift();
-      }
-      local_face_LR.push(face_value[0]);
-      local_face_UD.push(face_value[1]);
-      face_value.push(local_callJudge);
+    // ws.onmessage = async function(x){
+    //   var face_value = JSON.parse(x.data); //x.dataで送信された値の中身とってくる
 
-      //視線情報をhtmlで表示するために#rcv要素にstring型で値を追加していく
-      // var string_txt = "face_dir_LR: " + face_value[0] + " face_dir_UD: " + face_value[1] + " gaze_LR: " + face_value[2] + " gaze_UD: " + face_value[3] + "<br>"
-      // $("#rcv").append(string_txt)
-      await dataConnection.send(face_value);
-    }
+    //   if(local_face_LR.length > 12) {
+    //     local_face_LR.shift();
+    //     local_face_UD.shift();
+    //   }
+    //   local_face_LR.push(face_value[0]);
+    //   local_face_UD.push(face_value[1]);
+    //   face_value.push(local_callJudge);
+
+    //   //視線情報をhtmlで表示するために#rcv要素にstring型で値を追加していく
+    //   // var string_txt = "face_dir_LR: " + face_value[0] + " face_dir_UD: " + face_value[1] + " gaze_LR: " + face_value[2] + " gaze_UD: " + face_value[3] + "<br>"
+    //   // $("#rcv").append(string_txt)
+    //   await dataConnection.send(face_value);
+    // }
 
     //音声認識を受け取る
     recognition.onresult = (event) => {
@@ -300,57 +311,59 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     peer.on('connection', dataConnection => {
       dataConnection.once('open', async () => {
         // messages.textContent += `=== DataConnection has been opened ===\n`;
-        recognition.start();
+        // recognition.start();
         message='dummy';
         ws.send(message);
       });
 
       dataConnection.on('data', data => {
-        if(data[0] == 'v') {
-          speechdata = [remote_face_LR[remote_face_LR.length - 1], remote_face_UD[remote_face_UD.length - 1], 0, 0, 'v'];
-          // messages.textContent += `voice recieved.\n`;
-          ws.send(speechdata);
-        }else {
-          remote_face_LR.push(data[0]);
-          remote_face_UD.push(data[1]);
-          if(remote_face_LR.length > 12) {
-            remote_face_LR.shift();
-            remote_face_UD.shift();
-          }
+        console.log("received");
+        console.log(data);
+        // if(data[0] == 'v') {
+        //   speechdata = [remote_face_LR[remote_face_LR.length - 1], remote_face_UD[remote_face_UD.length - 1], 0, 0, 'v'];
+        //   // messages.textContent += `voice recieved.\n`;
+        //   ws.send(speechdata);
+        // }else {
+        //   remote_face_LR.push(data[0]);
+        //   remote_face_UD.push(data[1]);
+        //   if(remote_face_LR.length > 12) {
+        //     remote_face_LR.shift();
+        //     remote_face_UD.shift();
+        //   }
 
-          remote_callJudge = data[4];
-          now_time = Date.now();
+        //   remote_callJudge = data[4];
+        //   now_time = Date.now();
 
-          if(local_face_LR[local_face_LR.length - i] < 10 && local_face_LR[local_face_LR.length - i] > -10) {
-            last_time = Date.now();
-          }
+        //   if(local_face_LR[local_face_LR.length - i] < 10 && local_face_LR[local_face_LR.length - i] > -10) {
+        //     last_time = Date.now();
+        //   }
 
-          //相互注視判定
-          var i = 1;
-          while(i < 2) {
-            if(remote_face_LR[remote_face_LR.length - i] < 10 && remote_face_LR[remote_face_LR.length - i] > -10 && local_face_LR[local_face_LR.length - i] < 10 && local_face_LR[local_face_LR.length - i] > -10) {
-              i++;
-            }else {
-              break;
-            }
-          }
-          if(i == 2) {
-            localStream.getAudioTracks().forEach((track) => (track.enabled = true));
-            // messages.textContent += `Matual gaze detected.\n`;
-            local_callJudge = 1;
-            last_time = Date.now();
-          }else if(now_time - last_time > 10000) {
-            local_callJudge = 0;
-          }
+        //   //相互注視判定
+        //   var i = 1;
+        //   while(i < 2) {
+        //     if(remote_face_LR[remote_face_LR.length - i] < 10 && remote_face_LR[remote_face_LR.length - i] > -10 && local_face_LR[local_face_LR.length - i] < 10 && local_face_LR[local_face_LR.length - i] > -10) {
+        //       i++;
+        //     }else {
+        //       break;
+        //     }
+        //   }
+        //   if(i == 2) {
+        //     localStream.getAudioTracks().forEach((track) => (track.enabled = true));
+        //     // messages.textContent += `Matual gaze detected.\n`;
+        //     local_callJudge = 1;
+        //     last_time = Date.now();
+        //   }else if(now_time - last_time > 10000) {
+        //     local_callJudge = 0;
+        //   }
 
-          if(local_callJudge == 0 && remote_callJudge == 0) {
-            localStream.getAudioTracks().forEach((track) => (track.enabled = false));
-            data[4] = 'e';
-          }else {
-            data[4] = 'g';
-          }
-          ws.send(data); //pythonにリモートデータ送信
-        }
+        //   if(local_callJudge == 0 && remote_callJudge == 0) {
+        //     localStream.getAudioTracks().forEach((track) => (track.enabled = false));
+        //     data[4] = 'e';
+        //   }else {
+        //     data[4] = 'g';
+        //   }
+        //   ws.send(data); //pythonにリモートデータ送信
+        // }
       });
 
       //接続を終了する時の処理
@@ -363,22 +376,30 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         once: true,
       });
 
-      ws.onmessage = async function(x){
-        var face_value = JSON.parse(x.data); //x.dataで送信された値の中身とってくる
+      // ws.onmessage = async function(x){
+      //   var face_value = JSON.parse(x.data); //x.dataで送信された値の中身とってくる
 
-        if(local_face_LR.length > 12) {
-          local_face_LR.shift();
-          local_face_UD.shift();
-        }
-        local_face_LR.push(face_value[0]);
-        local_face_UD.push(face_value[1]);
-        face_value.push(local_callJudge);
+      //   if(local_face_LR.length > 12) {
+      //     local_face_LR.shift();
+      //     local_face_UD.shift();
+      //   }
+      //   local_face_LR.push(face_value[0]);
+      //   local_face_UD.push(face_value[1]);
+      //   face_value.push(local_callJudge);
       
-        //視線情報をhtmlで表示するために#rcv要素にstring型で値を追加していく
-        // var string_txt = "face_dir_LR: " + face_value[0] + " face_dir_UD: " + face_value[1] + " gaze_LR: " + face_value[2] + " gaze_UD: " + face_value[3] + "<br>"
-        // $("#rcv").append(string_txt)  
-        await dataConnection.send(face_value);
-      }
+      //   //視線情報をhtmlで表示するために#rcv要素にstring型で値を追加していく
+      //   // var string_txt = "face_dir_LR: " + face_value[0] + " face_dir_UD: " + face_value[1] + " gaze_LR: " + face_value[2] + " gaze_UD: " + face_value[3] + "<br>"
+      //   // $("#rcv").append(string_txt)  
+      //   await dataConnection.send(face_value);
+      // }
+
+      ws.onmessage = async function(message){
+        // 出力areaにメッセージを表示する。
+        messageTextArea.value += "Recieve From Server => "+message.data+"\n";
+        console.log("sended");
+        console.log(message.data);
+        await dataConnection.send("a");
+      };
 
       //音声認識を受け取る
       recognition.onresult = (event) => {
