@@ -30,6 +30,8 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
   var local_face_UD = [0];
   var remote_face_LR = [0];
   var remote_face_UD = [0];
+  var call_judege;
+  var call_judge_count;
 
   //時間記録用
   var last_time;
@@ -113,7 +115,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
   connectTrigger.addEventListener('click', () => {
     // Note that you need to ensure the peer has connected to signaling server
     // before using methods of peer instance.
-    //recognition.start();
+    // recognition.start();
     if (!peer.open) {
       return;
     }
@@ -124,9 +126,9 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     //初めて繋がった時にメッセージ送る
     dataConnection.once('open', async () => {
       // messages.textContent += `=== DataConnection has been opened ===\n`;
-      // recognition.start(); 音声認識！！！！！
+      // recognition.start();
       message='dummy';
-      // ws.send(message);
+      ws.send(message);
     });
 
 
@@ -141,22 +143,46 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         remote_posture.shift();
         remote_face_LR.shift();
         remote_face_UD.shift();
+        // ws.send(data);
       }
+      
+      // console.log("remote_data: " + data);
+      call_judege = 0;
+      if(remote_face_LR[19] == 4){
+        // console.log("相手はこっちをみているよ")
+        call_judege = 1;
+        if(local_face_LR[19] == 4){
+          call_judge_count += 1;
+        }else {
+          call_judge_count = 0;
+        }
+      }else {
+        call_judge_count = 0;
+      }
+
+      if(call_judge_count > 10) {
+        console.log("互いに相手を見ているよ")
+        call_judege = 2;
+        localStream.getAudioTracks().forEach((track) => (track.enabled = true));
+        last_time = Date.now();
+      }
+
+      ws.send(remote_posture[19] + "," + remote_face_LR[19] + "," + remote_face_UD[19] + "," + call_judege);
 
       now_time = Date.now();
 
-      // 音声通話判定
-      if(local_face_LR[19] == 4 && remote_face_LR[19] == 4) {
-        localStream.getAudioTracks().forEach((track) => (track.enabled = true));
-        local_callJudge = 1;
-        last_time = Date.now();
+      // // 音声通話判定
+      // if(local_face_LR[19] == 4 && remote_face_LR[19] == 4) {
+      //   localStream.getAudioTracks().forEach((track) => (track.enabled = true));
+      //   local_callJudge = 1;
+      //   last_time = Date.now();
+      // }
 
-        console.log("local:" + local_face_LR[19])
-      }
-
+      // 音声通話切断判定
       if(now_time - last_time > 5000) {
         localStream.getAudioTracks().forEach((track) => (track.enabled = false));
       }
+
     // if(data[0] == 'v') { //音声が送られた場合vを受け取る
     //   speechdata = [remote_face_LR[remote_face_LR.length - 1], remote_face_UD[remote_face_UD.length - 1], 0, 0, 'v'];
     //   // messages.textContent += `voice recieved.\n`;
@@ -228,7 +254,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         local_face_UD.shift();
       };
 
-      console.log(message.data[4]);
+      // console.log(message.data[4]);
       // console.log(local_posture);
       await dataConnection.send(message.data);
       // console.log("sended:" + message.data);
@@ -242,7 +268,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         if (event.results[i].isFinal) { //isFinalで終了したかどうかを判定
           finalTranscript += transcript;
           if(local_callJudge == 0 && remote_callJudge == 0) { //音声通話が接続していない状態のみ呼びかけを送信する
-            dataConnection.send("v");
+            // dataConnection.send("v");
             // messages.textContent += `voice sent.\n`;
           }
           last_time = Date.now();
@@ -307,7 +333,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         // messages.textContent += `=== DataConnection has been opened ===\n`;
         // recognition.start();
         message='dummy';
-        // ws.send(message);
+        ws.send(message);
       });
 
       dataConnection.on('data', data => {
@@ -322,18 +348,38 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
           remote_face_UD.shift();
         }
 
+        call_judege = 0;
+        if(remote_face_LR[19] == 4){
+          // console.log("相手はこっちをみているよ")
+          call_judege = 1;
+          if(local_face_LR[19] == 4){
+            call_judge_count += 1;
+          }else {
+            call_judge_count = 0;
+          }
+        }else {
+          call_judge_count = 0;
+        }
+  
+        if(call_judge_count > 10) {
+          console.log("互いに相手を見ているよ")
+          call_judege = 2;
+          localStream.getAudioTracks().forEach((track) => (track.enabled = true));
+          last_time = Date.now();
+        }
+  
+        ws.send(remote_posture[19] + "," + remote_face_LR[19] + "," + remote_face_UD[19] + "," + call_judege);
+  
         now_time = Date.now();
 
 
         // 音声通話判定
-        if(local_face_LR[19] == 4 && remote_face_LR[19] == 4) {
-          localStream.getAudioTracks().forEach((track) => (track.enabled = true));
-          local_callJudge = 1;
-          last_time = Date.now();
+        // if(local_face_LR[19] == 4 && remote_face_LR[19] == 4) {
+        //   localStream.getAudioTracks().forEach((track) => (track.enabled = true));
+        //   local_callJudge = 1;
+        //   last_time = Date.now();
 
-          console.log("local:" + local_face_LR[19])
-
-        }
+        // }
 
         if(now_time - last_time > 5000) {
           localStream.getAudioTracks().forEach((track) => (track.enabled = false));
@@ -419,7 +465,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
           if (event.results[i].isFinal) { //isFinalで終了したかどうかを判定
             finalTranscript += transcript;
             if(local_callJudge == 0 && remote_callJudge == 0) {
-              dataConnection.send("v");
+              // dataConnection.send("v");
               // messages.textContent += `voice sent.\n`;
             }
             last_time = Date.now();
