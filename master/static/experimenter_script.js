@@ -197,6 +197,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
           console.log("相手はこっちを見ているよ")
         }else {
           call_judge = 0;
+          console.log("通話なし！")
         }
       }else if(call_judge == 2) {
         if(remote_call_count >= 5 && local_call_count >= 5) {
@@ -211,7 +212,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       // 音声通話切断判定
       if(now_time - last_time > 10000) {
         localStream.getAudioTracks().forEach((track) => (track.enabled = false));
-        if(call_judege == 2){
+        if(call_judge == 2){
           console.log("音声通話ブチギレ！")
         }
         call_judge = 0;
@@ -358,6 +359,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
           console.log("相手はこっちを見ているよ");
         }else {
           call_judge = 0;
+          console.log("通話なし！")
         }
       }else if(call_judge == 2) {
         if(remote_call_count >= 5 && local_call_count >= 5) {
@@ -372,7 +374,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 
         if(now_time - last_time > 10000) {
           localStream.getAudioTracks().forEach((track) => (track.enabled = false));
-          if(call_judege == 2){
+          if(call_judge == 2){
             console.log("音声通話ブチギレ！")
           } 
           call_judge = 0;

@@ -175,6 +175,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
           console.log("相手はこっちを見ているよ");
         }else {
           call_judge = 0;
+          console.log("通話なし！")
         }
       }else if(call_judge == 2) {
         console.log("通話中だーー");
@@ -336,6 +337,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
             console.log("相手はこっちを見ているよ")
           }else {
             call_judge = 0;
+            console.log("通話なし！")
           }
         }else if(call_judge == 2) {
           console.log("通話中だーー")
