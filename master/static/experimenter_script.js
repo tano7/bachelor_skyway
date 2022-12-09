@@ -18,18 +18,18 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
   var ws = new WebSocket(host); //接続するサーバを指定
 
   // 集中度・音声通話判定用変数
-  var local_posture = [0];
-  var local_face_LR = [0];
-  var local_face_UD = [0];
-  var remote_posture = [0];
-  var remote_face_LR = [0];
-  var remote_face_UD = [0];
+  var local_posture = [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2];
+  var local_face_LR = [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2];
+  var local_face_UD = [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2];
+  var remote_posture = [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2];
+  var remote_face_LR = [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2];
+  var remote_face_UD = [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2];
 
   //相互注視検出用配列
-  var local_face_LR = [0];
-  var local_face_UD = [0];
-  var remote_face_LR = [0];
-  var remote_face_UD = [0];
+  // var local_face_LR = [0];
+  // var local_face_UD = [0];
+  // var remote_face_LR = [0];
+  // var remote_face_UD = [0];
   var call_judge = 0;
   var call_judge_count;
 
@@ -155,7 +155,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     dataConnection.once('open', async () => {
       // messages.textContent += `=== DataConnection has been opened ===\n`;
       // recognition.start();
-      message='dummy';
+      message='2,2,1,0.';
       ws.send(message);
     });
 
@@ -208,6 +208,8 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       // 音声通話切断判定
       if(now_time - last_time > 5000) {
         localStream.getAudioTracks().forEach((track) => (track.enabled = false));
+        console.log("音声通話ブチギレ！")
+        call_judge = 0;
       }
 
   }
@@ -311,7 +313,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       dataConnection.once('open', async () => {
         // messages.textContent += `=== DataConnection has been opened ===\n`;
         // recognition.start();
-        message='dummy';
+        message='2,2,1,0.';
         ws.send(message);
       });
 
@@ -361,6 +363,8 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 
         if(now_time - last_time > 5000) {
           localStream.getAudioTracks().forEach((track) => (track.enabled = false));
+          console.log("音声通話ブチギレ！")   
+          call_judge = 0;
         }
       });
 
