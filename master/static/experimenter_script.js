@@ -154,7 +154,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     //初めて繋がった時にメッセージ送る
     dataConnection.once('open', async () => {
       // messages.textContent += `=== DataConnection has been opened ===\n`;
-      // recognition.start();
+      recognition.start();
       message='2,2,1,0.';
       ws.send(message);
     });
@@ -197,7 +197,6 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
           console.log("相手はこっちを見ているよ")
         }else {
           call_judge = 0;
-          console.log("remote_call_count =" + remote_call_count)
         }
       }else if(call_judge == 2) {
         console.log("通話中だーー")
@@ -208,7 +207,9 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       // 音声通話切断判定
       if(now_time - last_time > 5000) {
         localStream.getAudioTracks().forEach((track) => (track.enabled = false));
-        console.log("音声通話ブチギレ！")
+        if(call_judege == 2){
+          console.log("音声通話ブチギレ！")
+        }
         call_judge = 0;
       }
 
@@ -253,6 +254,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
             // messages.textContent += `voice sent.\n`;
           }
           last_time = Date.now();
+          console.log('last_time1:' + last_time);
           console.log('voice recognition');
         } else {
           interimTranscript = transcript;
@@ -312,7 +314,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     peer.on('connection', dataConnection => {
       dataConnection.once('open', async () => {
         // messages.textContent += `=== DataConnection has been opened ===\n`;
-        // recognition.start();
+        recognition.start();
         message='2,2,1,0.';
         ws.send(message);
       });
@@ -398,15 +400,15 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       recognition.onresult = (event) => {
         let interimTranscript = ''; // 暫定(灰色)の認識結果
         for (let i = event.resultIndex; i < event.results.length; i++) {
-          let transcript = event.results[i][0].transcript;
+          let transcript = event.results[i][0].transcript; //event.result[i][0].transcriptに結果が入っている.
           if (event.results[i].isFinal) { //isFinalで終了したかどうかを判定
             finalTranscript += transcript;
-            if(local_callJudge == 0 && remote_callJudge == 0) {
+            if(local_callJudge == 0 && remote_callJudge == 0) { //音声通話が接続していない状態のみ呼びかけを送信する
               // dataConnection.send("v");
               // messages.textContent += `voice sent.\n`;
             }
             last_time = Date.now();
-            //recogtnition.stop();
+            console.log('last_time1:' + last_time);
             console.log('voice recognition');
           } else {
             interimTranscript = transcript;
@@ -416,7 +418,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       }
       recognition.onend = function(){
         recognition.start();
-      }
+    }
     });
 
     peer.on('error', console.error);
