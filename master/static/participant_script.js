@@ -156,10 +156,10 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       local_call_count = 0;
 
       for(let i = 10; i < 20; i++) {
-        if(remote_face_LR[i] == 4) {
+        if(remote_face_LR[i] == 1) {
           remote_call_count += 1;
         }
-        if(local_face_LR[i] == 4) {
+        if(local_face_LR[i] == 1) {
           local_call_count += 1;
         }
       }
@@ -169,14 +169,16 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
           call_judge = 2;
           localStream.getAudioTracks().forEach((track) => (track.enabled = true));
           last_time = Date.now();
-          console.log("音声通話開始！")
+          console.log("音声通話開始！");
         }else if(remote_call_count >= 9) {
           call_judge = 1;
-          console.log("相手はこっちを見ているよ")
+          console.log("相手はこっちを見ているよ");
         }else {
           call_judge = 0;
+          console.log("remote_call_count =" + remote_call_count);
         }
       }else if(call_judge == 2) {
+        console.log("通話中だーー");
       }
 
       ws.send(remote_posture[19] + "," + remote_face_LR[19] + "," + remote_face_UD[19] + "," + call_judge + ".");
@@ -187,6 +189,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       if(now_time - last_time > 5000) {
         localStream.getAudioTracks().forEach((track) => (track.enabled = false));
         call_judge = 0;
+        console.log("音声通話ブチギレ！")
       }
   }
   );
@@ -331,14 +334,20 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
             console.log("相手はこっちを見ているよ")
           }else {
             call_judge = 0;
+            console.log("remote_call_count =" + remote_call_count)
           }
         }else if(call_judge == 2) {
+          console.log("通話中だーー")
         }
   
-        ws.send(remote_posture[19] + "," + remote_face_LR[19] + "," + remote_face_UD[19] + "," + call_judge + ".");        now_time = Date.now();
+        ws.send(remote_posture[19] + "," + remote_face_LR[19] + "," + remote_face_UD[19] + "," + call_judge + ".");
+        
+        now_time = Date.now();
 
         if(now_time - last_time > 5000) {
           localStream.getAudioTracks().forEach((track) => (track.enabled = false));
+          call_judge = 0;
+          console.log("音声通話ブチギレ！")
         }
 
       });

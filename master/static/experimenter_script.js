@@ -178,10 +178,10 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       local_call_count = 0;
 
       for(let i = 10; i < 20; i++) {
-        if(remote_face_LR[i] == 4) {
+        if(remote_face_LR[i] == 1) {
           remote_call_count += 1;
         }
-        if(local_face_LR[i] == 4) {
+        if(local_face_LR[i] == 1) {
           local_call_count += 1;
         }
       }
@@ -197,8 +197,10 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
           console.log("相手はこっちを見ているよ")
         }else {
           call_judge = 0;
+          console.log("remote_call_count =" + remote_call_count)
         }
       }else if(call_judge == 2) {
+        console.log("通話中だーー")
       }
       ws.send(remote_posture[19] + "," + remote_face_LR[19] + "," + remote_face_UD[19] + "," + call_judge + ".");
       now_time = Date.now();
@@ -329,10 +331,10 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         local_call_count = 0;
 
       for(let i = 10; i < 20; i++) {
-        if(remote_face_LR[i] == 4) {
+        if(remote_face_LR[i] == 1) {
           remote_call_count += 1;
         }
-        if(local_face_LR[i] == 4) {
+        if(local_face_LR[i] == 1) {
           local_call_count += 1;
         }
       }
@@ -348,8 +350,10 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
           console.log("相手はこっちを見ているよ");
         }else {
           call_judge = 0;
+          console.log("remote_call_count =" + remote_call_count)
         }
       }else if(call_judge == 2) {
+        console.log("通話中だーー")
       }
   
         ws.send(remote_posture[19] + "," + remote_face_LR[19] + "," + remote_face_UD[19] + "," + call_judge + ".");  
