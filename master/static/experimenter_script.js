@@ -199,13 +199,17 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
           call_judge = 0;
         }
       }else if(call_judge == 2) {
+        if(remote_call_count >= 5 && local_call_count >= 5) {
+          call_judge = 2;
+          last_time = Date.now();
+        }
         console.log("通話中だーー")
       }
       ws.send(remote_posture[19] + "," + remote_face_LR[19] + "," + remote_face_UD[19] + "," + call_judge + ".");
       now_time = Date.now();
 
       // 音声通話切断判定
-      if(now_time - last_time > 5000) {
+      if(now_time - last_time > 10000) {
         localStream.getAudioTracks().forEach((track) => (track.enabled = false));
         if(call_judege == 2){
           console.log("音声通話ブチギレ！")
@@ -354,18 +358,23 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
           console.log("相手はこっちを見ているよ");
         }else {
           call_judge = 0;
-          console.log("remote_call_count =" + remote_call_count)
         }
       }else if(call_judge == 2) {
+        if(remote_call_count >= 5 && local_call_count >= 5) {
+          call_judge = 2;
+          last_time = Date.now();
+        }
         console.log("通話中だーー")
       }
   
         ws.send(remote_posture[19] + "," + remote_face_LR[19] + "," + remote_face_UD[19] + "," + call_judge + ".");  
         now_time = Date.now();
 
-        if(now_time - last_time > 5000) {
+        if(now_time - last_time > 10000) {
           localStream.getAudioTracks().forEach((track) => (track.enabled = false));
-          console.log("音声通話ブチギレ！")   
+          if(call_judege == 2){
+            console.log("音声通話ブチギレ！")
+          } 
           call_judge = 0;
         }
       });

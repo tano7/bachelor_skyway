@@ -185,7 +185,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       now_time = Date.now();
 
       // 音声通話切断判定
-      if(now_time - last_time > 5000) {
+      if(now_time - last_time > 10000) {
         localStream.getAudioTracks().forEach((track) => (track.enabled = false));
         if(call_judge == 2) {
           console.log("音声通話ブチギレ！")
@@ -345,7 +345,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         
         now_time = Date.now();
 
-        if(now_time - last_time > 5000) {
+        if(now_time - last_time > 10000) {
           localStream.getAudioTracks().forEach((track) => (track.enabled = false));
           if(call_judge == 2) {
             console.log("音声通話ブチギレ！")
