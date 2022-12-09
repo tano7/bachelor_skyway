@@ -30,8 +30,9 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
   var local_face_UD = [0];
   var remote_face_LR = [0];
   var remote_face_UD = [0];
-  var call_judege;
-  var call_judge_count;
+  var call_judge = 0;
+  var local_call_count;
+  var remote_call_count;
 
   //時間記録用
   var last_time;
@@ -150,88 +151,43 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       // call_judge = 0: 互いに別の方向を見ている
       // 1: 相手だけがこっちを見ている
       // 2: 相互注視
-      call_judege = 0;
-      if(remote_face_LR[19] == 4){
-        // console.log("相手はこっちをみているよ")
-        call_judege = 1;
-        if(local_face_LR[19] == 4){
-          call_judge_count += 1;
-        }else {
-          call_judge_count = 0;
+
+      remote_call_count = 0;
+      local_call_count = 0;
+
+      for(let i = 10; i < 20; i++) {
+        if(remote_face_LR[i] == 4) {
+          remote_call_count += 1;
         }
-      }else {
-        call_judge_count = 0;
+        if(local_face_LR[i] == 4) {
+          local_call_count += 1;
+        }
       }
 
-      if(call_judge_count > 10) {
-        console.log("互いに相手を見ているよ")
-        call_judege = 2;
-        localStream.getAudioTracks().forEach((track) => (track.enabled = true));
-        last_time = Date.now();
+      if(call_judge != 2) {
+        if(remote_call_count >= 9 && local_call_count >= 9) {
+          call_judge = 2;
+          localStream.getAudioTracks().forEach((track) => (track.enabled = true));
+          last_time = Date.now();
+          console.log("音声通話開始！")
+        }else if(remote_call_count >= 9) {
+          call_judge = 1;
+          console.log("相手はこっちを見ているよ")
+        }else {
+          call_judge = 0;
+        }
+      }else if(call_judge == 2) {
       }
 
-      ws.send(remote_posture[19] + "," + remote_face_LR[19] + "," + remote_face_UD[19] + "," + call_judege);
+      ws.send(remote_posture[19] + "," + remote_face_LR[19] + "," + remote_face_UD[19] + "," + call_judge + ".");
 
       now_time = Date.now();
-
-      // 音声通話判定
-      // if(local_face_LR[19] == 4 && remote_face_LR[19] == 4) {
-      //   localStream.getAudioTracks().forEach((track) => (track.enabled = true));
-      //   local_callJudge = 1;
-      //   last_time = Date.now();
-      // }
 
       // 音声通話切断判定
       if(now_time - last_time > 5000) {
         localStream.getAudioTracks().forEach((track) => (track.enabled = false));
+        call_judge = 0;
       }
-
-    // if(data[0] == 'v') { //音声が送られた場合vを受け取る
-    //   speechdata = [remote_face_LR[remote_face_LR.length - 1], remote_face_UD[remote_face_UD.length - 1], 0, 0, 'v'];
-    //   // messages.textContent += `voice recieved.\n`;
-    //   ws.send(speechdata);
-    // }else {
-    //   remote_face_LR.push(data[0]);
-    //   remote_face_UD.push(data[1]);
-    //   if(remote_face_LR.length > 12) {
-    //     remote_face_LR.shift();
-    //     remote_face_UD.shift();
-    //   }
-
-    //   remote_callJudge = data[4]; //相手の通話状態をdata[4]に格納（0 or 1），注視有無 && 20秒間通話有無
-    //   now_time = Date.now();
-
-    //   if(local_face_LR[local_face_LR.length - i] < 10 && local_face_LR[local_face_LR.length - i] > -10) {
-    //     last_time = Date.now();
-    //   }
-
-    //   //相互注視判定
-    //   var i = 1;
-    //   while(i < 2) { //ここと下のif (i==)の部分の数字によって長さ設定．今のところi = 1につき約0.14s
-    //     if(remote_face_LR[remote_face_LR.length - i] < 10 && remote_face_LR[remote_face_LR.length - i] > -10 && local_face_LR[local_face_LR.length - i] < 10 && local_face_LR[local_face_LR.length - i] > -10) {
-    //       i++;
-    //     }else {
-    //       break;
-    //     }
-    //   }
-    //   if(i == 2) {
-    //     // messages.textContent += `Matual gaze detected.\n`;
-    //     localStream.getAudioTracks().forEach((track) => (track.enabled = true));
-    //     local_callJudge = 1;
-    //     last_time = Date.now();
-    //   }else if (now_time - last_time > 10000) {
-    //     local_callJudge = 0;
-    //   }
-
-    //   if(local_callJudge == 0 && remote_callJudge == 0) {
-    //     localStream.getAudioTracks().forEach((track) => (track.enabled = false));
-    //     data[4] = 'e'; //通話接続ない状態
-    //   }else {
-    //     data[4] = 'g'; //通話接続状態
-    //   }
-
-    //   ws.send(data); //Pythonにリモートデータ送信
-    // }
   }
   );
 
@@ -352,88 +308,39 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
           remote_face_UD.shift();
         }
 
-        // 
-        call_judege = 0;
-        if(remote_face_LR[19] == 4){
-          // console.log("相手はこっちをみているよ")
-          call_judege = 1;
-          if(local_face_LR[19] == 4){
-            call_judge_count += 1;
-          }else {
-            call_judge_count = 0;
+        remote_call_count = 0;
+        local_call_count = 0;
+
+        for(let i = 10; i < 20; i++) {
+          if(remote_face_LR[i] == 1) {
+            remote_call_count += 1;
           }
-        }else {
-          call_judge_count = 0;
+          if(local_face_LR[i] == 1) {
+            local_call_count += 1;
+          }
+        }
+
+        if(call_judge != 2) {
+          if(remote_call_count >= 9 && local_call_count >= 9) {
+            call_judge = 2;
+            localStream.getAudioTracks().forEach((track) => (track.enabled = true));
+            last_time = Date.now();
+            console.log("音声通話開始！")
+          }else if(remote_call_count >= 9) {
+            call_judge = 1;
+            console.log("相手はこっちを見ているよ")
+          }else {
+            call_judge = 0;
+          }
+        }else if(call_judge == 2) {
         }
   
-        if(call_judge_count > 5) {
-          console.log("互いに相手を見ているよ")
-          call_judege = 2;
-          localStream.getAudioTracks().forEach((track) => (track.enabled = true));
-          last_time = Date.now();
-        }
-  
-        ws.send(remote_posture[19] + "," + remote_face_LR[19] + "," + remote_face_UD[19] + "," + call_judege);
-        now_time = Date.now();
-
-
-        // 音声通話判定
-        // if(local_face_LR[19] == 4 && remote_face_LR[19] == 4) {
-        //   localStream.getAudioTracks().forEach((track) => (track.enabled = true));
-        //   local_callJudge = 1;
-        //   last_time = Date.now();
-
-        // }
+        ws.send(remote_posture[19] + "," + remote_face_LR[19] + "," + remote_face_UD[19] + "," + call_judge + ".");        now_time = Date.now();
 
         if(now_time - last_time > 5000) {
           localStream.getAudioTracks().forEach((track) => (track.enabled = false));
         }
 
-        // if(data[0] == 'v') {
-        //   speechdata = [remote_face_LR[remote_face_LR.length - 1], remote_face_UD[remote_face_UD.length - 1], 0, 0, 'v'];
-        //   // messages.textContent += `voice recieved.\n`;
-        //   ws.send(speechdata);
-        // }else {
-        //   remote_face_LR.push(data[0]);
-        //   remote_face_UD.push(data[1]);
-        //   if(remote_face_LR.length > 12) {
-        //     remote_face_LR.shift();
-        //     remote_face_UD.shift();
-        //   }
-
-        //   remote_callJudge = data[4];
-        //   now_time = Date.now();
-
-        //   if(local_face_LR[local_face_LR.length - i] < 10 && local_face_LR[local_face_LR.length - i] > -10) {
-        //     last_time = Date.now();
-        //   }
-
-        //   //相互注視判定
-        //   var i = 1;
-        //   while(i < 2) {
-        //     if(remote_face_LR[remote_face_LR.length - i] < 10 && remote_face_LR[remote_face_LR.length - i] > -10 && local_face_LR[local_face_LR.length - i] < 10 && local_face_LR[local_face_LR.length - i] > -10) {
-        //       i++;
-        //     }else {
-        //       break;
-        //     }
-        //   }
-        //   if(i == 2) {
-        //     localStream.getAudioTracks().forEach((track) => (track.enabled = true));
-        //     // messages.textContent += `Matual gaze detected.\n`;
-        //     local_callJudge = 1;
-        //     last_time = Date.now();
-        //   }else if(now_time - last_time > 10000) {
-        //     local_callJudge = 0;
-        //   }
-
-        //   if(local_callJudge == 0 && remote_callJudge == 0) {
-        //     localStream.getAudioTracks().forEach((track) => (track.enabled = false));
-        //     data[4] = 'e';
-        //   }else {
-        //     data[4] = 'g';
-        //   }
-        //   ws.send(data); //pythonにリモートデータ送信
-        // }
       });
 
       //接続を終了する時の処理
