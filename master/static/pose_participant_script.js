@@ -178,6 +178,10 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
           console.log("通話なし！")
         }
       }else if(call_judge == 2) {
+        if(remote_call_count >= 9 && local_call_count >= 9) {
+          call_judge = 2;
+          last_time = Date.now();
+        }
         console.log("通話中だーー");
       }
 
@@ -188,6 +192,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       // 音声通話切断判定
       if(now_time - last_time > 10000) {
         localStream.getAudioTracks().forEach((track) => (track.enabled = false));
+        
         if(call_judge == 2) {
           console.log("音声通話ブチギレ！")
         }
@@ -340,6 +345,10 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
             console.log("通話なし！")
           }
         }else if(call_judge == 2) {
+          if(remote_call_count >= 9 && local_call_count >= 9) {
+            call_judge = 2;
+            last_time = Date.now();
+          }
           console.log("通話中だーー")
         }
   

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>gaze_call</title>
+    <link rel="stylesheet" href="https://tano7.github.io/bachelor_skyway/master/static/style.css">
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="heading">Gaze call System</h1>
+      <p class="note">
+        Enter remote peer ID to call.<br>
+      </p>
+      入力音声：<div id="result-div"></div>
+      <div class="p2p-data"> <!-- new -->
+        <div class="p2p-media">
+          <div class="remote-stream">
+            <video id="js-remote-stream"></video>
+          </div>
+          <div class="local-stream">
+            <video id="js-local-stream"></video>
+          </div> <!-- 移動-->
+          <p>Your ID: <span id="js-local-id"></span></p>
+          <select name='peer-id' id="peer-id">
+            <option value='1'>1</option>
+            <option value='2'>2</option>
+          </select>
+          <!-- <button id="create-peer">CreatePeer</button> -->
+          <input type="text" placeholder="Remote Peer ID" id="js-remote-id">
+          <button id="js-call-trigger">Call</button>
+          <button id="js-connect-trigger">Connect</button> <!-- new -->
+          <button id="stop-call">Mute</button>
+          <button id="js-close-trigger">Close</button>
+        </div>
+        <span id="rcv"></span>
+        <div class="parent">
+          <p><button id = "create-peer" class="btn-create">Start</button></p>
+        </div>
+        <!-- <div> 
+          <span id="remote"></span>
+          <pre class="messages" id="js-messages"></pre>  -->
+          <!--<input type="text" id="js-local-text">  
+          <button id="js-send-trigger">Send</button>  -->
+        <!-- </div> -->
+      </div>
+      <p class="meta" id="js-meta"></p>
+    </div>
+
+    <!-- 通信確認用 -->
+    <form>
+      <!-- サーバーにメッセージを送信するテキストボックス -->
+      <input id="textMessage" type="text">
+      <!-- 送信ボタン -->
+      <input onclick="sendMessage()" value="Send" type="button">
+      <!-- 接続終了ボタン -->
+      <input onclick="disconnect()" value="Disconnect" type="button">
+    </form>
+    <br />
+    <!-- 出力 area -->
+    <textarea id="messageTextArea" rows="10" cols="50"></textarea>
+
+
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.8.2.min.js"></script>
+    <script src="https://cdn.webrtc.ecl.ntt.com/skyway-latest.js"></script>
+    <!--<script src="{{url_for('static', filename='key.js')}}"></script>
+    <script src="{{url_for('static', filename='script.js')}}"></script>-->
+    <script src="https://tano7.github.io/bachelor_skyway/master/static/key.js"></script>
+    <!-- <script src="https://tano7.github.io/bachelor_skyway/master/static/script.js"></script> -->
+    <script type="text/javascript" src="../static/pose_participant_script.js"></script>
+    <script src="//code.jquery.com/jquery-1.8.2.min.js"></script>
+  </body>
+</html>

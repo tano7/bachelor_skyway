@@ -14,7 +14,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 (async function main() {
 
   //WebSocket部分
-  var host = "ws://localhost:9997";
+  var host = "ws://localhost:9999";
   var ws = new WebSocket(host); //接続するサーバを指定
 
   // 集中度・音声通話判定用変数
@@ -56,9 +56,9 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
   const resultDiv = document.querySelector('#result-div'); //音声認識
   const createPeer = document.getElementById('create-peer'); //PeerID生成
 
-  const posture1 = document.getElementById('posture1');
-  const posture2 = document.getElementById('posture2');
-  const posture3 = document.getElementById('posture3');
+  // const posture1 = document.getElementById('posture1');
+  // const posture2 = document.getElementById('posture2');
+  // const posture3 = document.getElementById('posture3');
 
   const gaze1 = document.getElementById('gaze1');
   const gaze2 = document.getElementById('gaze2');
@@ -67,15 +67,15 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 
   var gaze_value = 0;
 
-  posture1.addEventListener('click', () => {
-    posture_value = 1;
-  });
-  posture2.addEventListener('click', () => {
-    posture_value = 2;
-  });
-  posture3.addEventListener('click', () => {
-    posture_value = 3;
-  });
+  // posture1.addEventListener('click', () => {
+  //   posture_value = 1;
+  // });
+  // posture2.addEventListener('click', () => {
+  //   posture_value = 2;
+  // });
+  // posture3.addEventListener('click', () => {
+  //   posture_value = 3;
+  // });
 
   gaze1.addEventListener('click', () => {
     gaze_value = 1;
@@ -213,8 +213,8 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       if(now_time - last_time > 10000) {
         localStream.getAudioTracks().forEach((track) => (track.enabled = false));
         if(call_judge == 2){
-          gaze_value = 2;
           console.log("音声通話ブチギレ！")
+          gaze_value = 2;
         }
         call_judge = 0;
       }
@@ -235,7 +235,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
     ws.onmessage = async function(message){
       // 出力areaにメッセージを表示する。
       // messageTextArea.value += "Recieve From Server => "+message.data+"\n";
-      local_posture.push(posture_value);
+      local_posture.push(Number(message.data[1]));
       local_face_LR.push(gaze_value);
       local_face_UD.push(1);
       if(local_posture.length > 20) {
@@ -245,7 +245,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       };
 
       // await dataConnection.send(message.data);
-      await dataConnection.send("[" + posture_value + ", " + gaze_value + ", 1]");
+      await dataConnection.send("[" + local_posture[19] + ", " + gaze_value + ", 1]");
     };
 
     //音声認識を受け取る
@@ -377,7 +377,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         if(now_time - last_time > 10000) {
           localStream.getAudioTracks().forEach((track) => (track.enabled = false));
           if(call_judge == 2){
-            console.log("音声通話ブチギレ！")
+            console.log("音声通話ブチギレ！");
             gaze_value = 2;
           } 
           call_judge = 0;
@@ -397,7 +397,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
       ws.onmessage = async function(message){
         // 出力areaにメッセージを表示する。
         // messageTextArea.value += "Recieve From Server => "+message.data+"\n";
-        local_posture.push(posture_value);
+        local_posture.push(Number(message.data[1]));
         local_face_LR.push(gaze_value);
         local_face_UD.push(1);
         if(local_posture.length > 20) {
@@ -407,7 +407,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
         };
 
       // await dataConnection.send(message.data);
-        await dataConnection.send("[" + posture_value + ", " + gaze_value + ", 1]");
+        await dataConnection.send("[" + local_posture[19] + ", " + gaze_value + ", 1]");
       };
 
       //音声認識を受け取る
