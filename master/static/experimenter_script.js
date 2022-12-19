@@ -63,9 +63,9 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
   const gaze1 = document.getElementById('gaze1');
   const gaze2 = document.getElementById('gaze2');
 
-  var posture_value = 0;
+  var posture_value = 2;
 
-  var gaze_value = 0;
+  var gaze_value = 2;
 
   posture1.addEventListener('click', () => {
     posture_value = 1;
