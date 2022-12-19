@@ -104,9 +104,21 @@ video {
   border-bottom: none;/*線を消す*/
 }
 
-.button_size {
+.participant_button_top {
   margin-top: 500px;
+  width: 200px;
+  height: 100px;
+}
+
+.participant_button_top {
+  margin-top: 30px;
+  margin-bottom: 30px;
+  width: 200px;
+  height: 100px;
+}
+
+.participant_button_top {
   margin-bottom: 300px;
-  width: 100px;
-  height: 50px;
+  width: 200px;
+  height: 100px;
 }
