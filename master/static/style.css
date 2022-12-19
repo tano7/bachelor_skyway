@@ -110,14 +110,14 @@ video {
   height: 100px;
 }
 
-.participant_button_top {
+.participant_button_middle {
   margin-top: 30px;
   margin-bottom: 30px;
   width: 200px;
   height: 100px;
 }
 
-.participant_button_top {
+.participant_button_bottom {
   margin-bottom: 300px;
   width: 200px;
   height: 100px;
