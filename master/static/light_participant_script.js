@@ -62,6 +62,7 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
 
   const gaze1 = document.getElementById('gaze1');
   const gaze2 = document.getElementById('gaze2');
+  const call_response = document.getElementById('call_response');
 
   var posture_value = 0;
 
@@ -82,6 +83,9 @@ let finalTranscript = ''; // 確定した(黒の)認識結果
   });
   gaze2.addEventListener('click', () => {
     gaze_value = 2;
+  });
+  call_response.addEventListener('click', () => {
+    gaze_value = 1;
   });
 
   //とりあえず共通で書いておくやつ
